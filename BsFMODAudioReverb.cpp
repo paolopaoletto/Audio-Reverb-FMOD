@@ -1,6 +1,7 @@
 #include "BsFMODAudioReverb.h"
 
-namespace bs {
+namespace bs 
+{
 
 	FMODAudioReverb::FMODAudioReverb() 
 		: ir(nullptr), channel(nullptr), reverbGroup(nullptr), 
@@ -10,7 +11,8 @@ namespace bs {
 		gFMODAudio()._registerReverb(this);
 	}
 
-	FMODAudioReverb::~FMODAudioReverb() {
+	FMODAudioReverb::~FMODAudioReverb() 
+	{
 		gFMODAudio()._unregisterReverb(this);
 	}
 
