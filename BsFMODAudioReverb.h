@@ -7,7 +7,8 @@
 namespace bs 
 {
 
-	class FMODAudioReverb : public AudioReverb {
+	class FMODAudioReverb : public AudioReverb 
+	{
 	public:
 		FMODAudioReverb();
 		virtual ~FMODAudioReverb();
