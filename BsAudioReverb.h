@@ -20,7 +20,7 @@ namespace bs
 	};
 
 	/** 
-	*List of preset to apply for the Convolution reverb. 
+	* List of preset to apply for the Convolution reverb. 
 	* Just temporary. it will be one enum sharing the same element.
 	*/
 	enum class BS_SCRIPT_EXPORT(m:Audio) AudioReverbPresetIR {
