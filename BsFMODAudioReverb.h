@@ -4,7 +4,8 @@
 #include "BsFMODAudio.h"
 #include "Audio/BsAudioReverb.h"
 
-namespace bs {
+namespace bs 
+{
 
 	class FMODAudioReverb : public AudioReverb {
 	public:
