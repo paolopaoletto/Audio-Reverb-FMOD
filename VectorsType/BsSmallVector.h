@@ -253,7 +253,7 @@ namespace bs
 		}
 
 	protected:
-		_Type * first;
+		_Type* first;
 		_Type* last;
 		_Type* capacity;
 
