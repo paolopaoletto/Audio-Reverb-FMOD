@@ -40,7 +40,7 @@ namespace bs {
 		const char* s = (const char*)source;
 		const char* e = s + num;
 
-		for (; s < _e; d++, s++)
+		for (; s < e; d++, s++)
 		{
 			*d = *s;
 		}
