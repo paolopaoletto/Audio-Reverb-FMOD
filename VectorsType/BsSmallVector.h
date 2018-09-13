@@ -256,9 +256,15 @@ namespace bs {
 		}
 
 	protected:
+<<<<<<< HEAD
 		ValueType * first;
 		ValueType* last;
 		ValueType* capacity;
+=======
+		_Type* first;
+		_Type* last;
+		_Type* capacity;
+>>>>>>> 1edce6eb8f840650595f3aa3a547c848f8097039
 
 		/**
 		* Choose which system to use for the space representation.
