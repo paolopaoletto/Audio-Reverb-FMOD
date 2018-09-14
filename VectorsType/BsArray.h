@@ -162,7 +162,7 @@ namespace bs
 
 		if (elements)
 		{
-			if (sizeof(Type)*elements <= sizeof(buffer))
+			if (sizeof(Type) * elements <= sizeof(buffer))
 			{
 				tmp = reinterpret_cast<Type*>(buffer);
 			}
