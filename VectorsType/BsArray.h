@@ -115,13 +115,13 @@ namespace bs
 	}
 
 	template <class Type>
-	typename Array<Type>::Ptr Array<Type>::addressOf()
+	typename Array<Type>::Ptr Array<Type>::address()
 	{
 		return arr;
 	}
 
 	template <class Type>
-	typename Array<Type>::ConstPtr Array<Type>::addressOf() const
+	typename Array<Type>::ConstPtr Array<Type>::address() const
 	{
 		return arr;
 	}
