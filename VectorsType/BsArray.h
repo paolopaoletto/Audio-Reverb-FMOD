@@ -49,7 +49,7 @@ namespace bs
 		void removeValue(ConstReferenceType element);
 
 	private:
-		ValueType * arr = nullptr;
+		ValueType* arr = nullptr;
 		UINT32 length = 0;
 		UINT32 maxLength = 0;
 		char buffer[16];
@@ -109,7 +109,7 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::operator !=(const Array<Type>& other) const
+	bool Array<Type>::operator!= (const Array<Type>& other) const
 	{
 		return !(*this == other);
 	}
@@ -162,7 +162,7 @@ namespace bs
 
 		if (elements)
 		{
-			if (sizeof(Type)*elements <= sizeof(buffer))
+			if (sizeof(Type) * elements <= sizeof(buffer))
 			{
 				tmp = reinterpret_cast<Type*>(buffer);
 			}
@@ -179,17 +179,17 @@ namespace bs
 			if (arr == tmp)
 			{
 
-				for (UINT32 n = length; n < elements; n++)
+				for (UINT32 i = length; i < elements; i++)
 				{
-					new (&tmp[n]) Type();
+					new (&tmp[i]) Type();
 				}
 			}
 			else
 			{
 
-				for (UINT32 n = 0; n < elements; n++)
+				for (UINT32 i = 0; i < elements; i++)
 				{
-					new (&tmp[n]) Type();
+					new (&tmp[i]) Type();
 				}
 			}
 		}
@@ -253,7 +253,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::smallAlloc(UINT32 numElements, bool keepData)
+	void Array<Type>::smallAlloc(UINT32 numElements, bool data)
 	{
 		Type* tmp = 0;
 
