@@ -49,7 +49,7 @@ namespace bs
 		void removeValue(ConstReferenceType element);
 
 	private:
-		ValueType * arr = nullptr;
+		ValueType* arr = nullptr;
 		UINT32 length = 0;
 		UINT32 maxLength = 0;
 		char buffer[16];
@@ -109,7 +109,7 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::operator !=(const Array<Type>& other) const
+	bool Array<Type>::operator!= (const Array<Type>& other) const
 	{
 		return !(*this == other);
 	}
