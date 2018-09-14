@@ -27,8 +27,8 @@ namespace bs
 		ReferenceType operator[] (UINT32 index);
 		ConstReferenceType operator[] (UINT32 index) const;
 
-		Ptr addressOf();
-		ConstPtr addressOf() const;
+		Ptr address();
+		ConstPtr address() const;
 
 		void alloc(UINT32 elements, bool data);
 		void smallAlloc(UINT32 elements, bool data);
