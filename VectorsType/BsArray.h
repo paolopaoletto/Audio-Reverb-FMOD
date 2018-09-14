@@ -35,7 +35,7 @@ namespace bs
 
 		UINT32 getCapacity() const;
 
-		void add(const ConstReferenceType element);
+		void add(ConstReferenceType element);
 		ValueType pop();
 
 		bool setLength(UINT32 element);
