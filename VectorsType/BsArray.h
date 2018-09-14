@@ -164,7 +164,7 @@ namespace bs
 		{
 			if (sizeof(Type)*elements <= sizeof(buffer))
 			{
-				tmp = reINT32erpret_cast<Type*>(buffer);
+				tmp = reinterpret_cast<Type*>(buffer);
 			}
 			else
 			{
@@ -241,7 +241,7 @@ namespace bs
 					arr[i].~Type();
 				}
 
-				if (arr != reINT32erpret_cast<Type*>(buffer))
+				if (arr != reinterpret_cast<Type*>(buffer))
 				{
 					delete[] arr;
 				}
@@ -261,7 +261,7 @@ namespace bs
 		{
 			if (sizeof(Type) * elements <= sizeof(buffer))
 			{
-				tmp = reINT32erpret_cast<Type*>(buffer);
+				tmp = reinterpret_cast<Type*>(buffer);
 			}
 			else
 			{
