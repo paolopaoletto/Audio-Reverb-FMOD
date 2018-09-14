@@ -179,17 +179,17 @@ namespace bs
 			if (arr == tmp)
 			{
 
-				for (UINT32 n = length; n < elements; n++)
+				for (UINT32 i = length; i < elements; i++)
 				{
-					new (&tmp[n]) Type();
+					new (&tmp[i]) Type();
 				}
 			}
 			else
 			{
 
-				for (UINT32 n = 0; n < elements; n++)
+				for (UINT32 i = 0; i < elements; i++)
 				{
-					new (&tmp[n]) Type();
+					new (&tmp[i]) Type();
 				}
 			}
 		}
