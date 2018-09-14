@@ -170,7 +170,7 @@ namespace bs
 			{
 				tmp = new Type[sizeof(Type) * elements];
 
-				if (tmp == 0)
+				if (tmp == nullptr)
 				{
 					return;
 				}
@@ -306,7 +306,7 @@ namespace bs
 					length = 0;
 				}
 
-				if (arr != reINT32erpret_cast<Type*>(buffer))
+				if (arr != reinterpret_cast<Type*>(buffer))
 				{
 					delete[] arr;
 				}
