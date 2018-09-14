@@ -267,7 +267,7 @@ namespace bs
 			{
 				tmp = new Type[sizeof(Type) * elements];
 
-				if (tmp == 0)
+				if (tmp == nullptr)
 				{
 					return;
 				}
