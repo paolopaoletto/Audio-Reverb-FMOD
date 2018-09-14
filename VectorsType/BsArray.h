@@ -158,7 +158,7 @@ namespace bs
 	template <class Type>
 	void Array<Type>::alloc(UINT32 elements, bool data)
 	{
-		Type* tmp = 0;
+		Type* tmp = nullptr;
 
 		if (elements)
 		{
@@ -255,7 +255,7 @@ namespace bs
 	template <class Type>
 	void Array<Type>::smallAlloc(UINT32 numElements, bool data)
 	{
-		Type* tmp = 0;
+		Type* tmp = nullptr;
 
 		if (elements)
 		{
