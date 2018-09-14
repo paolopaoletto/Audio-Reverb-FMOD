@@ -104,7 +104,7 @@ namespace bs
 				return false;
 			}
 		}
-
+		
 		return true;
 	}
 
