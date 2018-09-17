@@ -181,7 +181,7 @@ namespace bs {
 
 		/** Reverse iteration methods. */
 		ReverseIterator rbegin() { return ReverseIterator(end()); }
-		ReverseIterator rend() { return reverse_iterator(begin()); }
+		ReverseIterator rend() { return ReverseIterator(begin()); }
 
 		/** Constant Reverse iteration methods. */
 		ConstReverseIterator crbegin() const { return ReverseIterator(end()); }
