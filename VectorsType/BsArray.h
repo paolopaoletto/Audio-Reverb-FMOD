@@ -27,15 +27,15 @@ namespace bs
 		ReferenceType operator[] (UINT32 index);
 		ConstReferenceType operator[] (UINT32 index) const;
 
-		Ptr addressOf();
-		ConstPtr addressOf() const;
+		Ptr address();
+		ConstPtr address() const;
 
 		void alloc(UINT32 elements, bool data);
 		void smallAlloc(UINT32 elements, bool data);
 
 		UINT32 getCapacity() const;
 
-		void add(const ConstReferenceType element);
+		void add(ConstReferenceType element);
 		ValueType pop();
 
 		bool setLength(UINT32 element);
@@ -115,13 +115,13 @@ namespace bs
 	}
 
 	template <class Type>
-	typename Array<Type>::Ptr Array<Type>::addressOf()
+	typename Array<Type>::Ptr Array<Type>::address()
 	{
 		return arr;
 	}
 
 	template <class Type>
-	typename Array<Type>::ConstPtr Array<Type>::addressOf() const
+	typename Array<Type>::ConstPtr Array<Type>::address() const
 	{
 		return arr;
 	}
@@ -158,7 +158,7 @@ namespace bs
 	template <class Type>
 	void Array<Type>::alloc(UINT32 elements, bool data)
 	{
-		Type* tmp = 0;
+		Type* tmp = nullptr;
 
 		if (elements)
 		{
@@ -170,7 +170,7 @@ namespace bs
 			{
 				tmp = new Type[sizeof(Type) * elements];
 
-				if (tmp == 0)
+				if (tmp == nullptr)
 				{
 					return;
 				}
@@ -255,7 +255,7 @@ namespace bs
 	template <class Type>
 	void Array<Type>::smallAlloc(UINT32 numElements, bool data)
 	{
-		Type* tmp = 0;
+		Type* tmp = nullptr;
 
 		if (elements)
 		{
@@ -267,7 +267,7 @@ namespace bs
 			{
 				tmp = new Type[sizeof(Type) * elements];
 
-				if (tmp == 0)
+				if (tmp == nullptr)
 				{
 					return;
 				}
@@ -306,7 +306,7 @@ namespace bs
 					length = 0;
 				}
 
-				if (arr != reINT32erpret_cast<Type*>(buffer))
+				if (arr != reinterpret_cast<Type*>(buffer))
 				{
 					delete[] arr;
 				}
