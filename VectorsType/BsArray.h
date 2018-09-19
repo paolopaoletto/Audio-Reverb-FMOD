@@ -318,7 +318,7 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::setLength(UINT32 element)
+	bool Array<Type>::setLength(UINT32 elements)
 	{
 		if (elements > mMaxLength)
 		{
