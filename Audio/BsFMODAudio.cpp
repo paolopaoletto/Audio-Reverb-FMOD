@@ -85,7 +85,7 @@ namespace bs
 	{
 		stopManualSources();
 
-		assert(mListeners.empty() && mSources.empty()); // Everything should be destroyed at this point
+		assert(mListeners.empty() && mSources.empty() && mReverbs.empty()); // Everything should be destroyed at this point
 		mFMOD->release();
 	}
 

@@ -78,7 +78,7 @@ namespace bs
 		friend class AudioClip;
 		friend class AudioListener;
 		friend class AudioSource;
-		/* Added new */
+		/*Add New*/
 		friend class AudioReverb;
 
 		/** 
@@ -100,7 +100,6 @@ namespace bs
 		virtual SPtr<AudioSource> createSource() = 0;
 
 		/** Creates a new AudioReverb. */
-		/* Added new */
 		virtual SPtr<AudioReverb> createReverb() = 0;
 
 		/** Stops playback of all sources started with Audio::play calls. */

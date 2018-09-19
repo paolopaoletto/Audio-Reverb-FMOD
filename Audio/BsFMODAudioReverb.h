@@ -4,11 +4,9 @@
 #include "BsFMODAudio.h"
 #include "Audio/BsAudioReverb.h"
 
-namespace bs 
-{
+namespace bs {
 
-	class FMODAudioReverb : public AudioReverb 
-	{
+	class FMODAudioReverb : public AudioReverb {
 	public:
 		FMODAudioReverb();
 		virtual ~FMODAudioReverb();
@@ -64,21 +62,26 @@ namespace bs
 	private:
 		friend class FMODAudio;
 
-		FMOD::Sound* ir;
-		FMOD::Channel* channel;
-		FMOD::ChannelGroup* reverbGroup;
-		FMOD::DSP* reverbUnit;
-		FMOD::DSP* channelHead;
-		FMOD::DSPConnection* reverbConnection;
+		/** @copydoc IResourceListener::onClipChanged */
+		void onClipChanged() override;
+
+		FMOD::Sound* ir = nullptr;
+		FMOD::Channel* channel = nullptr;
+		FMOD::ChannelGroup* reverbGroup = nullptr;
+		FMOD::DSP* reverbUnit = nullptr;
+		FMOD::DSP* channelHead = nullptr;
+		FMOD::DSPConnection* reverbConnection = nullptr;
 
 		INT32 irSoundBits;
 		INT32 IrSoundChannels;
 		UINT32 irLength;
+		UINT32 irDataLength;
+		INT16 irData;
 
 		FMOD_SOUND_FORMAT irSoundFormat;
 		FMOD_SOUND_TYPE irSoundType;
 
-		FMOD::Reverb3D* reverb3D;
+		FMOD::Reverb3D* reverb3D = nullptr;
 		FMOD_REVERB_PROPERTIES prop;
 	};
 

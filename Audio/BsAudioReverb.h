@@ -20,7 +20,7 @@ namespace bs
 	};
 
 	/** 
-	* List of preset to apply for the Convolution reverb. 
+	*List of preset to apply for the Convolution reverb. 
 	* Just temporary. it will be one enum sharing the same element.
 	*/
 	enum class BS_SCRIPT_EXPORT(m:Audio) AudioReverbPresetIR {
@@ -42,7 +42,7 @@ namespace bs
 	* Convolution Reverb is the one that takes an impulse response in .wav format, making the virtual space from it.
 	* Algorithmic Reverb is the one generated from the algorithm integrated into the library.
 	*/
-	class BS_CORE_EXPORT AudioReverb : public IReflectable, public SceneActor 
+	class BS_CORE_EXPORT AudioReverb : public IReflectable, public SceneActor, public IResourceListener
 	{
 	public:
 		virtual ~AudioReverb();
@@ -189,31 +189,39 @@ namespace bs
 	protected:
 		AudioReverb();
 
-	private:
-		float mWetVolume;
-		float mDryVolume;
+		/** @copydoc IResourceListener::getListenerResources */
+		void getListenerResources(Vector<HResource>& resources) override;
+
+		/** @copydoc IResourceListener::notifyResourceChanged */
+		void notifyResourceChanged(const HResource& resource) override;
+
+		/** Triggered by the resources system whenever the attached audio clip changed (e.g. was reimported.) */
+		virtual void onClipChanged() { }
+
+		float mWetVolume = 1.0f;
+		float mDryVolume = 1.0f;
 		
 		struct {
-			float mDecayTime;
-			float mEarlyDelay;
-			float mLateDelay;
-			float mHFReference;
-			float mHFDecayRatio;
-			float mDiffusion;
-			float mDensity;
-			float mLowShelfFrequencies;
-			float mLowShelfGain;
-			float mHighCut;
-			float mEarlyLateMix;
-			float mWetLevel;
+			float mDecayTime = 500.0f;
+			float mEarlyDelay = 5.0f;
+			float mLateDelay = 9.0f;
+			float mHFReference = 5000.f;
+			float mHFDecayRatio = 40.0f;
+			float mDiffusion = 100.0f;
+			float mDensity = 100.0f;
+			float mLowShelfFrequencies = 250.0f;
+			float mLowShelfGain = 10.0f;
+			float mHighCut = 20000.0f;
+			float mEarlyLateMix = 50.0f;
+			float mWetLevel = -8.0f;
 		};
 
 		HAudioSource mSource;
 		HAudioClip mIr;
 
-		AudioReverbPreset mPreset;
+		AudioReverbPreset mPreset = AudioReverbPreset::SmallRoom;
 
-		bool mIsReverbIR;
+		bool mIsReverbIR = false;
 
 		/************************************************************************/
 		/* 								RTTI		                     		*/

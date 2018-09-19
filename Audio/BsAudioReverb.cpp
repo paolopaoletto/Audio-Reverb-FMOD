@@ -5,12 +5,6 @@
 namespace bs {
 
 	AudioReverb::AudioReverb()
-		: mWetVolume(1.0f), mDryVolume(1.0f), mIsReverbIR(false), 
-		mPreset(AudioReverbPreset::SmallRoom),
-		mDecayTime(500.0f), mEarlyDelay(5.0f), mLateDelay(9.0f),
-		mHFReference(5000.0f), mHFDecayRatio(40.0f), mDiffusion(100.0f),
-		mDensity(100.0f), mLowShelfFrequencies(250.0f), mLowShelfGain(10.0f),
-		mHighCut(20000.0f), mEarlyLateMix(50.0f), mWetLevel(-8.0f)
 	{
 
 	}
@@ -27,6 +21,9 @@ namespace bs {
 	void AudioReverb::setIR(const HAudioClip& clip) 
 	{
 		mIr = clip;
+		mIsReverbIR = true;
+
+		markListenerResourcesDirty();
 	}
 
 	void AudioReverb::setWetVolume(float volume) 
@@ -107,6 +104,17 @@ namespace bs {
 	SPtr<AudioReverb> AudioReverb::create() 
 	{
 		return gAudio().createReverb();
+	}
+
+	void AudioReverb::getListenerResources(Vector<HResource>& resources) 
+	{
+		if (mIr != nullptr)
+			resources.push_back(mIr);
+	}
+
+	void AudioReverb::notifyResourceChanged(const HResource& resource) 
+	{
+		onClipChanged();
 	}
 
 	RTTITypeBase* AudioReverb::getRTTIStatic()
