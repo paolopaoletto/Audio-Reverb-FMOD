@@ -1,86 +1,38 @@
 #pragma once
 
-#include <cstring>
-#include <algorithm>
-#include <memory>
-#include <type_traits>
+#include "Prerequisites/BsPrerequisitesUtil.h"
+#include "Allocators/BsStaticAlloc.h"
 
-namespace bs {
-
-	template<typename InputIt, typename ForwardIt>
-	ForwardIt uninitialized_copy(InputIt first, InputIt last, ForwardIt d_first)
-	{
-		typedef typename std::iterator_traits<ForwardIt>::ValueType Value;
-		ForwardIt current = d_first;
-
-		try
-		{
-			for (; first != last; ++first, ++current)
-			{
-				::new (static_cast<void*>(&*current)) Value(*first);
-			}
-
-			return current;
-		}
-		catch (...)
-		{
-			for (; d_first != current; ++d_first)
-			{
-				d_first->~Value();
-			}
-
-			throw;
-		}
-	}
-
-	template<typename Type>
-	void memcpy(void* dest, const void* source, Type num)
-	{
-		char* d = (char*)dest;
-		const char* s = (const char*)source;
-		const char* e = s + num;
-
-		for (; s < e; d++, s++)
-		{
-			*d = *s;
-		}
-	}
-
+namespace bs
+{
 	template <class Type>
 	class SmallVectorBuffer
 	{
 	public:
 		/** Types */
 		typedef Type ValueType;
-		typedef ValueType* Ptr;
-		typedef const ValueType* ConstPtr;
-		typedef ValueType& ReferenceType;
-		typedef const ValueType& ConstReferenceType;
-		typedef std::size_t SizeType;
-		typedef std::ptrdiff_t DifferenceType;
-
 		typedef Type* Iterator;
 		typedef const Type* ConstIterator;
-		typedef std::reverse_iterator<Ptr> ReverseIterator;
-		typedef std::reverse_iterator<ConstPtr> ConstReverseIterator;
+		typedef std::reverse_iterator<Type*> ReverseIterator;
+		typedef std::reverse_iterator<const Type*> ConstReverseIterator;
 
 	protected:
 		/** Determines when the small vector has not had dynamic allocation. */
 		bool isSmall() const
 		{
-			return static_cast<const void*>(first) == static_cast<const void*>(&firstElement);
+			return static_cast<const void*>(mFirst) == static_cast<const void*>(&firstElement);
 		}
 
 		void deallocateOldElements()
 		{
 			if (!isSmall())
 			{
-				operator delete(first);
+				operator delete(mFirst);
 			}
 		}
 
 		/** Construct the elements range. */
-		void constructElements(Ptr f, Ptr l, ConstReferenceType element)
+		void constructElements(Type* f, Type* l, const Type& element)
 		{
 			for (; f != l; ++f)
 			{
@@ -89,7 +41,7 @@ namespace bs {
 		}
 
 		/** Destroy the elements range. */
-		void destroyElements(Ptr f, Ptr l)
+		void destroyElements(Type* f, Type* l)
 		{
 			while (f != l)
 			{
@@ -99,45 +51,45 @@ namespace bs {
 		}
 
 	protected:
-		void grow(SizeType min = 0)
+		void grow(size_t min = 0)
 		{
-			const SizeType current = capacity - first;
-			const SizeType size = size();
-			SizeType newCapacity = current * 2;
+			const size_t current = mCapacity - mFirst;
+			const size_t size = size();
+			size_t newCapacity = current * 2;
 
 			if (newCapacity < min)
 			{
 				newCapacity = min;
 			}
 
-			Ptr newElements = static_cast<Ptr>(operator new(newCapacity * sizeof(ValueType)));
+			Type* newElements = static_cast<Type*>(operator new(newCapacity * sizeof(ValueType)));
 
 			if (std::is_class<ValueType>::value)
 			{
-				bs::uninitialized_copy(first, last, newElements);
+				std::uninitialized_copy(mFirst, mLast, newElements);
 			}
 			else
 			{
-				bs::memcpy(newElements, first, size * sizeof(ValueType));
+				memcpy(newElements, mFirst, size * sizeof(ValueType));
 			}
 
-			destroyElements(first, last);
+			destroyElements(mFirst, mLast);
 
 			deallocateOldElements();
 
-			first = newElements;
-			last = newElements + size;
-			capacity = first + newCapacity;
+			mFirst = newElements;
+			mLast = newElements + size;
+			mCapacity = mFirst + newCapacity;
 		}
 
 	public:
-		SmallVectorBuffer(unsigned N)
-			: first(reinterpret_cast<Type*>(&firstElement)), last(reinterpret_cast<Type*>(&firstElement)),
-			capacity(reinterpret_cast<Type*>(&firstElement) + N) { }
+		SmallVectorBuffer(UINT32 N)
+			: mFirst(reinterpret_cast<Type*>(&firstElement)), mLast(reinterpret_cast<Type*>(&firstElement)),
+			mCapacity(reinterpret_cast<Type*>(&firstElement) + N) { }
 
 		~SmallVectorBuffer()
 		{
-			destroyElements(first, last);
+			destroyElements(mFirst, mLast);
 
 			deallocateOldElements();
 		};
@@ -147,8 +99,8 @@ namespace bs {
 			if (size() != other.size())
 				return false;
 
-			const SizeType s = size();
-			for (Type* tp = first, *tph = other.first, *e = first + s; tp != e; ++tp, ++tph)
+			const size_t s = size();
+			for (Type* tp = mFirst, *tph = other.mFirst, *e = mFirst + s; tp != e; ++tp, ++tph)
 			{
 				if (*tp != tph)
 					return false;
@@ -159,25 +111,18 @@ namespace bs {
 
 		bool operator!= (const SmallVectorBuffer& other) { return !(*this == other); }
 
-		ReferenceType operator[] (SizeType index)
-		{
-			return first[index];
-		}
+		Type& operator[] (size_t index) { return mFirst[index]; }
+		const Type& operator[] (size_t index) const { return mFirst[index]; }
 
-		ConstReferenceType operator[] (SizeType index) const
-		{
-			return first[index];
-		}
-
-		bool isEmpty() const { return first == last; }
+		bool isEmpty() const { return mFirst == mLast; }
 
 		/** Forward iteration methods. */
-		Iterator begin() { return first; }
-		Iterator end() { return last; }
+		Iterator begin() { return mFirst; }
+		Iterator end() { return mLast; }
 
 		/** Constant Forward iteration methods. */
-		ConstIterator cbegin() const { return first; }
-		ConstIterator cend() const { return last; }
+		ConstIterator cbegin() const { return mFirst; }
+		ConstIterator cend() const { return mLast; }
 
 		/** Reverse iteration methods. */
 		ReverseIterator rbegin() { return ReverseIterator(end()); }
@@ -188,82 +133,82 @@ namespace bs {
 		ConstReverseIterator crend() const { return ReverseIterator(begin()); }
 
 		/** Return the size of the small vector. */
-		SizeType size() { return last - first; }
+		size_t size() { return mLast - mFirst; }
 
 		/** Return the front element of the small vector. */
-		ReferenceType front() { return first[0]; }
+		Type& front() { return mFirst[0]; }
 
 		/** Return the back element of the small vector. */
-		ReferenceType back() { return last[-1]; }
+		Type& back() { return mLast[-1]; }
 
 		/** Return the constant front element of the small vector. */
-		ConstReferenceType front() const { return first[0]; }
+		const Type& front() const { return mFirst[0]; }
 
 		/** Return the constant back element of the small vector. */
-		ConstReferenceType back() const { return last[-1]; }
+		const Type& back() const { return mLast[-1]; }
 
 		/** Push the element into the small vector. */
-		void add(ConstReferenceType element)
+		void add(const Type& element)
 		{
-			if (last < capacity)
+			if (mLast < mCapacity)
 			{
-				new (last) ValueType(element);
-				++last;
+				new (mLast) ValueType(element);
+				++mLast;
 			}
 		}
 
 		/** Pop the element into the small vector. */
 		void pop()
 		{
-			--last;
-			last->~ValueType();
+			--mLast;
+			mLast->~ValueType();
 		}
 
 		/** Clear the elements of the small vector. */
 		void clear()
 		{
-			destroyElements(first, last);
-			last = first;
+			destroyElements(mFirst, mLast);
+			mLast = mFirst;
 		}
 
 		/** Resize N size allocations into the small vector. */
-		void resize(unsigned N)
+		void resize(UINT32 N)
 		{
 			if (N < size())
 			{
-				destroyElements(first + N, last);
-				last = first + N;
+				destroyElements(mFirst + N, mLast);
+				mLast = mFirst + N;
 			}
 			else if (N > size())
 			{
-				if (static_cast<unsigned>(capacity - last) < N)
+				if (static_cast<UINT32>(mCapacity - mLast) < N)
 				{
 					grow(N);
 				}
 
-				constructElements(last, first + N, ValueType());
-				last = first + N;
+				constructElements(mLast, mFirst + N, ValueType());
+				mLast = mFirst + N;
 			}
 		}
 
 		/** Reserve N size allocations into the small vector. */
-		void reserve(unsigned N)
+		void reserve(UINT32 N)
 		{
-			if (static_cast<unsigned>(capacity - last) < N)
+			if (static_cast<UINT32>(mCapacity - mLast) < N)
 			{
 				grow(N);
 			}
 		}
 
 	protected:
-		ValueType * first;
-		ValueType* last;
-		ValueType* capacity;
+		ValueType* mFirst;
+		ValueType* mLast;
+		ValueType* mCapacity;
 
 		/**
 		* Choose which system to use for the space representation.
 		*/
-#ifdef USE_CHAR
+#ifdef BS_SMALL_VECTOR_USE_CHAR
 		typedef char U;
 		U firstElement __declspec(align(16));
 #else
@@ -277,154 +222,33 @@ namespace bs {
 #endif
 	};
 
-	template <class Type>
-	class SmallVectorIter
-	{
-	public:
-		SmallVectorIter(Type* _ptr, Type* _arr, Type* _buffer, size_t _size)
-			: ptr(ptr), arr(_arr), buffer(_buffer), size(_size) { }
-
-		SmallVectorIter(const SmallVectorIter<Type>& svec)
-			: ptr(svec.ptr), arr(svec.arr), buffer(svec.buffer), size(svec.size) { }
-
-		Type& operator*() { return *ptr; }
-		Type* operator&() { return ptr; }
-		const Type& operator*() const { return *ptr; }
-		const Type* operator&() const { return ptr; }
-
-		bool operator==(const SmallVectorIter<Type>& other) { return ptr == other.ptr; }
-		bool operator!=(const SmallVectorIter<Type>& other) { return ptr != other.ptr; }
-		const bool operator==(const SmallVectorIter<Type>& other) const { return ptr == other.ptr; }
-		const bool operator!=(const SmallVectorIter<Type>& other) const { return ptr != other.ptr; }
-
-		SmallVectorIter<Type>& operator++()
-		{
-			if (ptr == arr + size - 1)
-			{
-				ptr = buffer;
-			}
-			else
-			{
-				++ptr;
-			}
-
-			return *this;
-		}
-
-		SmallVectorIter<Type>& operator--()
-		{
-			if (ptr == buffer)
-			{
-				ptr = arr + size - 1;
-			}
-			else
-			{
-				--ptr;
-			}
-
-			return *this;
-		}
-
-		SmallVectorIter<Type> operator++(int)
-		{
-			SmallVectorIter<Type> tmp(*this);
-			operator++();
-
-			return tmp;
-		}
-
-		SmallVectorIter<Type> operator--(int)
-		{
-			SmallVectorIter<Type> tmp(*this);
-			operator--();
-
-			return tmp;
-		}
-
-		SmallVectorIter<Type>& operator+=(const int& i)
-		{
-			if (offset + i >= size && ptr + i < buffer)
-			{
-				ptr = buffer + i - (size - ptr - buffer);
-			}
-			else
-			{
-				ptr += i;
-			}
-
-			return *this;
-		}
-
-		SmallVectorIter<Type> operator+(const int& i)
-		{
-			SmallVectorIter<Type> tmp(*this);
-			operator+=(i);
-
-			return tmp;
-		}
-
-		SmallVectorIter<Type>& operator-=(const int& i)
-		{
-			if (ptr - i < buffer && ptr - arr >= size)
-			{
-				ptr = arr + size - i + ptr - buffer;
-			}
-			else
-			{
-				ptr -= i;
-			}
-
-			return *this;
-		}
-
-		SmallVectorIter<Type> operator-(const int& i)
-		{
-			SmallVectorIter<Type> tmp(*this);
-			operator-=(i);
-
-			return tmp;
-		}
-
-		Type* ptr;
-		Type* arr;
-		Type* buffer;
-		size_t size;
-	};
-
-	template <unsigned N, class Type>
+	template <UINT32 N, class Type>
 	class SmallVector final : public SmallVectorBuffer<Type>
 	{
 	public:
 		typedef Type ValueType;
-		typedef ValueType* Ptr;
-		typedef const ValueType* ConstPtr;
-		typedef ValueType& ReferenceType;
-		typedef const ValueType& ConstReferenceType;
-		typedef std::size_t SizeType;
-		typedef std::ptrdiff_t DifferenceType;
-
 	private:
 		typedef typename SmallVectorBuffer<Type>::U Unit;
 
 		/** The number of the union U require for N template type. */
-		static const auto minUnit = (static_cast<UINT32>(sizeof(ValueType))*N +
+		static constexpr auto MINUNIT = (static_cast<UINT32>(sizeof(ValueType))*N +
 			static_cast<UINT32>(sizeof(Unit)) - 1 /
 			static_cast<UINT32>(sizeof(Unit)));
 
 		/** Contains the number of elements of the array. */
-		static const auto elements = (minUnit - 1) > 0 ? (minUnit - 1) : 1;
+		static constexpr auto ELEMENTS = (MINUNIT - 1) > 0 ? (MINUNIT - 1) : 1;
 
 		/** Contains the number of template type that the arrays has space for. */
-		static const auto alloc = (elements + 1)*static_cast<UINT32>(sizeof(Unit)) /
+		static constexpr auto ALLOC = (ELEMENTS + 1)*static_cast<UINT32>(sizeof(Unit)) /
 			static_cast<UINT32>(sizeof(ValueType));
 
 		/** Instance of the union U in the small vector buffer. */
-		Unit element[elements];
+		Unit element[ELEMENTS];
 
 	public:
-		SmallVector() : SmallVectorBuffer<ValueType>(alloc) { };
-		SmallVector(SizeType size, ConstReferenceType value = ValueType())
-			: SmallVectorBuffer<ValueType>(alloc)
+		SmallVector() : SmallVectorBuffer<ValueType>(ALLOC) { };
+		SmallVector(size_t size, const Type& value = ValueType())
+			: SmallVectorBuffer<ValueType>(ALLOC)
 		{
 			this->reserve(size);
 			while (size--)
@@ -433,7 +257,6 @@ namespace bs {
 			}
 		}
 
-		virtual ~SmallVector() { };
-
+		~SmallVector() = default;
 	};
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BsCorePrerequisites.h"
+#include "Prerequisites/BsPrerequisitesUtil.h"
 
 namespace bs 
 {
@@ -9,12 +9,6 @@ namespace bs
 	{
 	public:
 		typedef Type ValueType;
-		typedef ValueType* Ptr;
-		typedef const ValueType* ConstPtr;
-		typedef ValueType& ReferenceType;
-		typedef const ValueType& ConstReferenceType;
-		typedef std::size_t SizeType;
-		typedef std::ptrdiff_t DifferenceType;
 
 		Array();
 		Array(const Array& other);
@@ -24,35 +18,35 @@ namespace bs
 		bool operator==(const Array<ValueType>& other) const;
 		bool operator!=(const Array<ValueType>& other) const;
 
-		ReferenceType operator[] (UINT32 index);
-		ConstReferenceType operator[] (UINT32 index) const;
+		Type& operator[] (UINT32 index);
+		const Type& operator[] (UINT32 index) const;
 
-		Ptr address();
-		ConstPtr address() const;
+		Type* address();
+		const Type* address() const;
 
 		void alloc(UINT32 elements, bool data);
 		void smallAlloc(UINT32 elements, bool data);
 
 		UINT32 getCapacity() const;
 
-		void add(ConstReferenceType element);
+		void add(const Type& element);
 		ValueType pop();
 
 		bool setLength(UINT32 element);
 		bool setSmallLength(UINT32 element);
 		UINT32 getLength() const;
 
-		bool exists(ConstReferenceType element) const;
-		UINT32 indexElement(ConstReferenceType element) const;
+		bool exists(const Type& element) const;
+		int indexElement(const Type& element) const;
 
 		void removeIndex(UINT32 index);
-		void removeValue(ConstReferenceType element);
+		void removeValue(const Type& element);
 
 	private:
-		ValueType* arr = nullptr;
-		UINT32 length = 0;
-		UINT32 maxLength = 0;
-		char buffer[16];
+		ValueType* mArr = nullptr;
+		UINT32 mLength = 0;
+		UINT32 mMaxLength = 0;
+		char mBuffer[16];
 	};
 
 	template <class Type>
@@ -73,38 +67,38 @@ namespace bs
 	template <class Type>
 	Array<Type>::~Array()
 	{
-		delete[] arr;
+		delete[] mArr;
 	}
 
 	template <class Type>
-	typename Array<Type>::ReferenceType Array<Type>::operator[] (UINT32 index)
+	Type& Array<Type>::operator[] (UINT32 index)
 	{
-		return arr[index];
+		return mArr[index];
 	}
 
 	template <class Type>
-	typename Array<Type>::ConstReferenceType Array<Type>::operator[] (UINT32 index) const
+	const Type& Array<Type>::operator[] (UINT32 index) const
 	{
-		return arr[index];
+		return mArr[index];
 	}
 
 
 	template <class Type>
 	bool Array<Type>::operator== (const Array<Type>& other) const
 	{
-		if (length != other.length)
+		if (mLength != other.mLength)
 		{
 			return false;
 		}
 
-		for (UINT32 i = 0; i < length; i++)
+		for (UINT32 i = 0; i < mLength; i++)
 		{
-			if (arr[i] != other.arr[i])
+			if (mArr[i] != other.mArr[i])
 			{
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -115,71 +109,71 @@ namespace bs
 	}
 
 	template <class Type>
-	typename Array<Type>::Ptr Array<Type>::address()
+	Type* Array<Type>::address()
 	{
-		return arr;
+		return mArr;
 	}
 
 	template <class Type>
-	typename Array<Type>::ConstPtr Array<Type>::address() const
+	const Type* Array<Type>::address() const
 	{
-		return arr;
+		return mArr;
 	}
 
 	template <class Type>
-	void Array<Type>::add(typename Array<Type>::ConstReferenceType element)
+	void Array<Type>::add(const Type& element)
 	{
-		if (length == maxLength)
+		if (mLength == mMaxLength)
 		{
-			if (maxLength == 0)
+			if (mMaxLength == 0)
 			{
 				alloc(1, false);
 			}
 			else
 			{
-				alloc(2 * maxLength, true);
+				alloc(2 * mMaxLength, true);
 			}
 
-			if (length == maxLength)
+			if (mLength == mMaxLength)
 			{
 				return;
 			}
 		}
 
-		arr[length++] = element;
+		mArr[mLength++] = element;
 	}
 
 	template <class Type>
 	typename Array<Type>::ValueType Array<Type>::pop()
 	{
-		return arr[--length];
+		return mArr[--mLength];
 	}
 
 	template <class Type>
 	void Array<Type>::alloc(UINT32 elements, bool data)
 	{
-		Type* tmp = nullptr;
+		Type* tmp = 0;
 
 		if (elements)
 		{
-			if (sizeof(Type) * elements <= sizeof(buffer))
+			if (sizeof(Type)*elements <= sizeof(mBuffer))
 			{
-				tmp = reinterpret_cast<Type*>(buffer);
+				tmp = reinterpret_cast<Type*>(mBuffer);
 			}
 			else
 			{
 				tmp = new Type[sizeof(Type) * elements];
 
-				if (tmp == nullptr)
+				if (tmp == 0)
 				{
 					return;
 				}
 			}
 
-			if (arr == tmp)
+			if (mArr == tmp)
 			{
 
-				for (UINT32 i = length; i < elements; i++)
+				for (UINT32 i = mLength; i < elements; i++)
 				{
 					new (&tmp[i]) Type();
 				}
@@ -187,156 +181,156 @@ namespace bs
 			else
 			{
 
-				for (UINT32 i = 0; i < elements; i++)
+				for (UINT32 n = 0; n < elements; n++)
 				{
 					new (&tmp[i]) Type();
 				}
 			}
 		}
 
-		if (arr)
+		if (mArr)
 		{
-			const UINT32 oldLength = length;
+			const UINT32 oldLength = mLength;
 
-			if (arr == tmp)
+			if (mArr == tmp)
 			{
 				if (data)
 				{
-					if (length > elements)
+					if (mLength > elements)
 					{
-						length = elements;
+						mLength = elements;
 					}
 				}
 				else
 				{
-					length = 0;
+					mLength = 0;
 				}
 
-				for (UINT32 i = length; i < oldLength; i++)
+				for (UINT32 i = mLength; i < oldLength; i++)
 				{
-					arr[i].~Type();
+					mArr[i].~Type();
 				}
 			}
 			else
 			{
 				if (data)
 				{
-					if (length > elements)
+					if (mLength > elements)
 					{
-						length = elements;
+						mLength = elements;
 					}
 
-					for (UINT32 i = 0; i < length; i++)
+					for (UINT32 i = 0; i < mLength; i++)
 					{
-						tmp[i] = arr[i];
+						tmp[i] = mArr[i];
 					}
 				}
 				else
 				{
-					length = 0;
+					mLength = 0;
 				}
 
 				for (UINT32 i = 0; i < oldLength; i++)
 				{
-					arr[i].~Type();
+					mArr[i].~Type();
 				}
 
-				if (arr != reinterpret_cast<Type*>(buffer))
+				if (mArr != reinterpret_cast<Type*>(mBuffer))
 				{
-					delete[] arr;
+					delete[] mArr;
 				}
 			}
 		}
 
-		arr = tmp;
-		maxLength = elements;
+		mArr = tmp;
+		mMaxLength = elements;
 	}
 
 	template <class Type>
-	void Array<Type>::smallAlloc(UINT32 numElements, bool data)
+	void Array<Type>::smallAlloc(UINT32 numElements, bool keepData)
 	{
-		Type* tmp = nullptr;
+		Type* tmp = 0;
 
 		if (elements)
 		{
-			if (sizeof(Type) * elements <= sizeof(buffer))
+			if (sizeof(Type) * elements <= sizeof(mBuffer))
 			{
-				tmp = reinterpret_cast<Type*>(buffer);
+				tmp = reinterpret_cast<Type*>(mBuffer);
 			}
 			else
 			{
 				tmp = new Type[sizeof(Type) * elements];
 
-				if (tmp == nullptr)
+				if (tmp == 0)
 				{
 					return;
 				}
 			}
 		}
 
-		if (arr)
+		if (mArr)
 		{
-			if (arr == tmp)
+			if (mArr == tmp)
 			{
 				if (data)
 				{
-					if (length > elements)
+					if (mLength > elements)
 					{
-						length = elements;
+						mLength = elements;
 					}
 				}
 				else
 				{
-					length = 0;
+					mLength = 0;
 				}
 			}
 			else
 			{
 				if (data)
 				{
-					if (length > elements)
+					if (mLength > elements)
 					{
-						length = elements;
+						mLength = elements;
 					}
 
-					memcpy(tmp, arr, sizeof(Type) * length);
+					memcpy(tmp, mArr, sizeof(Type) * mLength);
 				}
 				else
 				{
-					length = 0;
+					mLength = 0;
 				}
 
-				if (arr != reinterpret_cast<Type*>(buffer))
+				if (mArr != reinterpret_cast<Type*>(mBuffer))
 				{
-					delete[] arr;
+					delete[] mArr;
 				}
 			}
 		}
 
-		arr = tmp;
-		maxLength = elements;
+		mArr = tmp;
+		mMaxLength = elements;
 	}
 
 	template <class Type>
 	UINT32 Array<Type>::getCapacity() const
 	{
-		return maxLength;
+		return mMaxLength;
 	}
 
 	template <class Type>
 	bool Array<Type>::setLength(UINT32 element)
 	{
-		if (elements > maxLength)
+		if (elements > mMaxLength)
 		{
 			alloc(elements, true);
 
-			if (elements > maxLength)
+			if (elements > mMaxLength)
 			{
 				return false;
 			}
 		}
 
-		length = elements;
+		mLength = element;
 
 		return true;
 	}
@@ -344,17 +338,17 @@ namespace bs
 	template <class Type>
 	bool Array<Type>::setSmallLength(UINT32 elements)
 	{
-		if (elements > maxLength)
+		if (elements > mMaxLength)
 		{
 			smallAlloc(elements, true);
 
-			if (elements > maxLength)
+			if (elements > mMaxLength)
 			{
 				return false;
 			}
 		}
 
-		length = elements;
+		mLength = elements;
 
 		return true;
 	}
@@ -362,23 +356,23 @@ namespace bs
 	template <class Type>
 	UINT32 Array<Type>::getLength() const
 	{
-		return length;
+		return mLength;
 	}
 
 	template <class Type>
-	bool Array<Type>::exists(typename Array<Type>::ConstReferenceType element) const
+	bool Array<Type>::exists(const Type& element) const
 	{
 		return indexElement(element) == -1 ? false : true;
 	}
 
 	template <class Type>
-	INT32 Array<Type>::indexElement(typename Array<Type>::ConstReferenceType element) const
+	int Array<Type>::indexElement(const Type& element) const
 	{
-		for (UINT32 i = 0; i < length; i++)
+		for (UINT32 i = 0; i < mLength; i++)
 		{
-			if (arr[i] == element)
+			if (mArr[i] == element)
 			{
-				return static_cast<INT32>(i);
+				return static_cast<int>(i);
 			}
 		}
 
@@ -388,11 +382,11 @@ namespace bs
 	template <class Type>
 	void Array<Type>::removeIndex(UINT32 index)
 	{
-		if (index < length)
+		if (index < mLength)
 		{
-			for (UINT32 i = index; i < length - 1; i++)
+			for (UINT32 i = index; i < mLength - 1; i++)
 			{
-				arr[i] = arr[i + 1];
+				mArr[i] = mArr[i + 1];
 			}
 
 			pop();
@@ -400,11 +394,11 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::removeValue(typename Array<Type>::ConstReferenceType element)
+	void Array<Type>::removeValue(const Type& element)
 	{
-		for (UINT32 i = 0; i < length; i++)
+		for (UINT32 i = 0; i < mLength; i++)
 		{
-			if (arr[i] == element)
+			if (mArr[i] == element)
 			{
 				removeIndex(i);
 				break;

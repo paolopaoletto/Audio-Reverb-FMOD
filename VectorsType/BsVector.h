@@ -1,51 +1,28 @@
-#include "BsCorePrerequisites.h"
+#pragma once
+
+#include "Prerequisites/BsPrerequisitesUtil.h"
+#include "Allocators/BsStaticAlloc.h"
 
 namespace bs 
 {
-	template<class Type>
-	typename std::remove_reference<Type>::type&& move(Type&& arg)
-	{
-		return static_cast<typename std::remove_reference<Type>::type&&>(arg);
-	}
-
-	template <class Type>
-	Type&& forward(typename std::remove_reference<Type>::type& arg)
-	{
-		return static_cast<Type&&>(arg);
-	}
-
-	template <class Type>
-	Type&& forward(typename std::remove_reference<Type>::type&& arg)
-	{
-		static_assert(!std::is_lvalue_reference<Type>::value, "Cannot make forward an rvalue as an lvalue.");
-		return static_cast<Type&&>(arg);
-	}
-
 	template <class Type>
 	class Vector final
 	{
 	public:
 		typedef Type ValueType;
-		typedef ValueType* Ptr;
-		typedef const ValueType* ConstPtr;
-		typedef ValueType& ReferenceType;
-		typedef const ValueType& ConstReferenceType;
-		typedef std::size_t SizeType;
-		typedef std::ptrdiff_t DifferenceType;
-
 		typedef Type* Iterator;
 		typedef const Type* ConstIterator;
-		typedef std::reverse_iterator<Ptr> ReverseIterator;
-		typedef std::reverse_iterator<ConstPtr> ConstReverseIterator;
+		typedef std::reverse_iterator<Type*> ReverseIterator;
+		typedef std::reverse_iterator<const Type*> ConstReverseIterator;
 
 		typedef typename Vector<ValueType>::Iterator IteratorType;
 		typedef typename Vector<ValueType>::Iterator ConstIteratorType;
 
 		Vector();
-		Vector(SizeType n, ConstReferenceType value);
+		Vector(size_t n, const Type& value);
 		Vector(Iterator first, Iterator last);
 		Vector(const Vector<Type>& other);
-		virtual ~Vector();
+		~Vector();
 
 		Vector<ValueType>& operator= (const Vector<ValueType>& other);
 		Vector<ValueType>& operator= (Vector<ValueType>&& other);
@@ -57,10 +34,10 @@ namespace bs
 		bool operator> (const Vector<ValueType>& other) const;
 		bool operator>= (const Vector<ValueType>& other) const;
 
-		ReferenceType operator[] (SizeType index);
-		ConstReferenceType operator[] (SizeType index) const;
+		Type& operator[] (size_t index);
+		const Type& operator[] (size_t index) const;
 
-		void assign(SizeType n, ConstReferenceType value);
+		void assign(size_t n, const Type& value);
 		void assign(IteratorType first, IteratorType last);
 
 		bool empty() const;
@@ -77,30 +54,30 @@ namespace bs
 		ConstReverseIterator crbegin() const;
 		ConstReverseIterator crend() const;
 
-		SizeType size() const;
-		SizeType max_size() const;
-		SizeType capacity() const;
+		size_t size() const;
+		size_t max_size() const;
+		size_t capacity() const;
 
-		void resize(SizeType _size);
-		void resize(SizeType _size, ConstReferenceType _ref);
-		void reserve(SizeType _size);
+		void resize(size_t _size);
+		void resize(size_t _size, const Type& _ref);
+		void reserve(size_t _size);
 		void shrink_to_fit();
 
-		ReferenceType at(SizeType index);
-		ReferenceType front();
-		ReferenceType back();
+		Type& at(size_t index);
+		Type& front();
+		Type& back();
 
-		ConstReferenceType at(SizeType index) const;
-		ConstReferenceType front() const;
-		ConstReferenceType back() const;
+		const Type& at(size_t index) const;
+		const Type& front() const;
+		const Type& back() const;
 
-		Ptr data();
-		ConstPtr data() const;
+		Type* data();
+		const Type* data() const;
 
 		template <typename ...Args>
 		void emplace_back(Args&& ...args);
 
-		void push_back(ConstReferenceType element);
+		void push_back(const Type& element);
 		void push_back(ValueType&& element);
 		void pop_back();
 		void swap(Vector<Type>& other);
@@ -111,110 +88,111 @@ namespace bs
 		Iterator erase(ConstIterator first, ConstIterator last);
 
 	private:
-		Ptr arr;
-		SizeType initSize = 2;
-		SizeType arrSize = 0;
-		const SizeType BS_VECTOR_SIZE = 2 << 16;
+		Type* mArr;
+		size_t mInitSize = 2;
+		size_t mArrSize = 0;
+		StaticAlloc alloc;
+		const size_t BS_VECTOR_SIZE = 2 << 16;
 	};
 
 	template <class Type>
 	Vector<Type>::Vector()
 	{
-		arr = new Type[initSize];
+		mArr = new Type[mInitSize];
 	}
 
 	template <class Type>
-	Vector<Type>::Vector(SizeType n, ConstReferenceType value)
+	Vector<Type>::Vector(size_t n, const Type& value)
 	{
-		initSize = n << 2;
-		arr = new Type[initSize];
+		mInitSize = n << 2;
+		mArr = new Type[mInitSize];
 
-		for (SizeType i = 0; i < n; ++i)
+		for (size_t i = 0; i < n; ++i)
 		{
-			arr[i] = value;
+			mArr[i] = value;
 		}
 
-		arrSize = n;
+		mArrSize = n;
 	}
 
 	template <class Type>
 	Vector<Type>::Vector(Iterator first, Iterator last)
 	{
-		SizeType count = last - first;
-		initSize = count << 2;
-		arr = new Type[initSize];
+		size_t count = last - first;
+		mInitSize = count << 2;
+		mArr = new Type[mInitSize];
 
-		for (SizeType i = 0; i < count; ++i, ++first)
+		for (size_t i = 0; i < count; ++i, ++first)
 		{
-			arr[i] = *first;
+			mArr[i] = *first;
 		}
 
-		arrSize = count;
+		mArrSize = count;
 	}
 
 	template <class Type>
 	Vector<Type>::Vector(const Vector<Type>& other)
 	{
-		initSize = other.initSize;
-		arr = new Type[initSize];
+		mInitSize = other.mInitSize;
+		mArr = new Type[mInitSize];
 
-		for (SizeType i = 0; i < other.arrSize; ++i)
+		for (size_t i = 0; i < other.mArrSize; ++i)
 		{
-			arr[i] = other.arr[i];
+			mArr[i] = other.mArr[i];
 		}
 
-		arrSize = other.arrSize;
+		mArrSize = other.mArrSize;
 	}
 
 	template <class Type>
 	Vector<Type>::~Vector()
 	{
-		delete[] arr;
+		delete[] mArr;
 	}
 
 	template <class Type>
 	Vector<Type>& Vector<Type>::operator= (const Vector<Type>& other)
 	{
-		if (initSize < other.arrSize)
+		if (mInitSize < other.mArrSize)
 		{
-			initSize = other.arrSize << 2;
+			mInitSize = other.mArrSize << 2;
 			reallocate();
 		}
 
-		for (SizeType i = 0; i < other.arrSize; ++i)
+		for (size_t i = 0; i < other.mArrSize; ++i)
 		{
-			arr[i] = other.arr[i];
+			mArr[i] = other.mArr[i];
 		}
 
-		arrSize = other.arrSize;
+		mArrSize = other.mArrSize;
 	}
 
 	template <class Type>
 	Vector<Type>& Vector<Type>::operator= (Vector<Type>&& other)
 	{
-		if (initSize < other.arrSize)
+		if (mInitSize < other.mArrSize)
 		{
-			initSize = other.arrSize << 2;
+			mInitSize = other.mArrSize << 2;
 			reallocate();
 		}
 
-		for (SizeType i = 0; i < other.arrSize; ++i)
+		for (size_t i = 0; i < other.mArrSize; ++i)
 		{
-			arr[i] = bs::move(other.arr[i]);
+			mArr[i] = std::move(other.mArr[i]);
 		}
 
-		arrSize = other.arrSize;
+		mArrSize = other.mArrSize;
 	}
 
 	template <typename Type>
 	bool Vector<Type>::operator== (const Vector<Type>& other) const
 	{
-		if (arrSize != other.arrSize)
+		if (mArrSize != other.mArrSize)
 			return false;
 
-		for (SizeType i = 0; i < arrSize; ++i)
+		for (size_t i = 0; i < mArrSize; ++i)
 		{
-			if (arr[i] != other.arr[i])
+			if (mArr[i] != other.mArr[i])
 				return false;
 		}
 
@@ -224,12 +202,12 @@ namespace bs
 	template <typename Type>
 	bool Vector<Type>::operator!= (const Vector<Type>& other) const
 	{
-		if (arrSize != other.arrSize)
+		if (mArrSize != other.mArrSize)
 			return true;
 
-		for (SizeType i = 0; i < arrSize; ++i)
+		for (size_t i = 0; i < mArrSize; ++i)
 		{
-			if (arr[i] != other.arr[i])
+			if (mArr[i] != other.mArr[i])
 				return true;
 		}
 
@@ -239,229 +217,229 @@ namespace bs
 	template <typename Type>
 	bool Vector<Type>::operator< (const Vector<Type>& other) const
 	{
-		SizeType length = arrSize < other.arrSize ? arrSize : other.arrSize;
+		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
-		for (SizeType i = 0; i < length; ++i)
+		for (size_t i = 0; i < length; ++i)
 		{
-			if (arr[i] != other.arr[i])
-				return arr[i] < other.arr[i];
+			if (mArr[i] != other.mArr[i])
+				return mArr[i] < other.mArr[i];
 		}
 
-		return arrSize < other.arrSize;
+		return mArrSize < other.mArrSize;
 	}
 
 	template <typename Type>
 	bool Vector<Type>::operator<= (const Vector<Type>& other) const
 	{
-		SizeType length = arrSize < other.arrSize ? arrSize : other.arrSize;
+		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
-		for (SizeType i = 0; i < length; ++i)
+		for (size_t i = 0; i < length; ++i)
 		{
-			if (arr[i] != other.arr[i])
-				return arr[i] < other.arr[i];
+			if (mArr[i] != other.mArr[i])
+				return mArr[i] < other.mArr[i];
 		}
 
-		return arrSize <= other.arrSize;
+		return mArrSize <= other.mArrSize;
 	}
 
 	template <typename Type>
 	bool Vector<Type>::operator> (const Vector<Type>& other) const
 	{
-		SizeType length = arrSize < other.arrSize ? arrSize : other.arrSize;
+		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
-		for (SizeType i = 0; i < length; ++i)
+		for (size_t i = 0; i < length; ++i)
 		{
-			if (arr[i] != other.arr[i])
-				return arr[i] > other.arr[i];
+			if (mArr[i] != other.mArr[i])
+				return mArr[i] > other.mArr[i];
 		}
 
-		return arrSize > other.arrSize;
+		return mArrSize > other.mArrSize;
 	}
 
 	template <typename Type>
 	bool Vector<Type>::operator>= (const Vector<Type>& other) const
 	{
-		SizeType length = arrSize < other.arrSize ? arrSize : other.arrSize;
+		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
-		for (SizeType i = 0; i < length; ++i)
+		for (size_t i = 0; i < length; ++i)
 		{
-			if (arr[i] != other.arr[i])
-				return arr[i] > other.arr[i];
+			if (mArr[i] != other.mArr[i])
+				return mArr[i] > other.mArr[i];
 		}
 
-		return arrSize >= other.arrSize;
+		return mArrSize >= other.mArrSize;
 	}
 
 	template <class Type>
-	void Vector<Type>::assign(SizeType count, ConstReferenceType value)
+	void Vector<Type>::assign(size_t count, const Type& value)
 	{
-		if (count > initSize)
+		if (count > mInitSize)
 		{
-			initSize = count << 2;
+			mInitSize = count << 2;
 			reallocate();
 		}
 
-		for (SizeType i = 0; i < count; ++i)
+		for (size_t i = 0; i < count; ++i)
 		{
-			arr[i] = value;
+			mArr[i] = value;
 		}
 
-		arrSize = count;
+		mArrSize = count;
 	}
 
 	template <class Type>
 	void Vector<Type>::assign(IteratorType first, IteratorType last)
 	{
-		SizeType count = last - first;
-		if (count > initSize)
+		size_t count = last - first;
+		if (count > mInitSize)
 		{
-			initSize = count << 2;
+			mInitSize = count << 2;
 			reallocate();
 		}
 
-		for (SizeType i = 0; i < count; ++i, ++first)
+		for (size_t i = 0; i < count; ++i, ++first)
 		{
-			arr[i] = *first;
+			mArr[i] = *first;
 		}
 
-		arrSize = count;
+		mArrSize = count;
 	}
 
 	template <class Type>
 	typename Vector<Type>::Iterator Vector<Type>::begin()
 	{
-		return arr;
+		return mArr;
 	}
 
 	template <class Type>
 	typename Vector<Type>::Iterator Vector<Type>::end()
 	{
-		return arr + arrSize;
+		return mArr + mArrSize;
 	}
 
 	template <class Type>
 	typename Vector<Type>::ConstIterator Vector<Type>::cbegin() const
 	{
-		return arr;
+		return mArr;
 	}
 
 
 	template <class Type>
 	typename Vector<Type>::ConstIterator Vector<Type>::cend() const
 	{
-		return arr + arrSize;
+		return mArr + mArrSize;
 	}
 
 	template <class Type>
 	typename Vector<Type>::ReverseIterator Vector<Type>::rbegin()
 	{
-		return ReverseIterator(arr + arrSize);
+		return ReverseIterator(mArr + mArrSize);
 	}
 
 	template <class Type>
 	typename Vector<Type>::ReverseIterator Vector<Type>::rend()
 	{
-		return ReverseIterator(arr);
+		return ReverseIterator(mArr);
 	}
 
 	template <class Type>
 	typename Vector<Type>::ConstReverseIterator Vector<Type>::crbegin() const
 	{
-		return ReverseIterator(arr + arrSize);
+		return ReverseIterator(mArr + mArrSize);
 	}
 
 	template <class Type>
 	typename Vector<Type>::ConstReverseIterator Vector<Type>::crend() const
 	{
-		return ReverseIterator(arr);
+		return ReverseIterator(mArr);
 	}
 
 	template <class Type>
 	void Vector<Type>::reallocate()
 	{
-		Type* tmp = new Type[initSize];
+		Type* tmp = new Type[mInitSize];
 
-		memcpy(tmp, arr, arrSize * sizeof(Type));
+		memcpy(tmp, mArr, mArrSize * sizeof(Type));
 
-		delete[] arr;
-		arr = tmp;
+		delete[] mArr;
+		mArr = tmp;
 	}
 
 	template <class Type>
 	bool Vector<Type>::empty() const
 	{
-		return arrSize == 0;
+		return mArrSize == 0;
 	}
 
 	template <class Type>
-	typename Vector<Type>::SizeType Vector<Type>::size() const
+	size_t Vector<Type>::size() const
 	{
-		return arrSize;
+		return mArrSize;
 	}
 
 	template <typename Type>
-	typename Vector<Type>::SizeType Vector<Type>::max_size() const
+	size_t Vector<Type>::max_size() const
 	{
 		return BS_VECTOR_SIZE;
 	}
 
 	template <class Type>
-	typename Vector<Type>::SizeType Vector<Type>::capacity() const
+	size_t Vector<Type>::capacity() const
 	{
-		return initSize;
+		return mInitSize;
 	}
 
 	template <class Type>
-	void Vector<Type>::resize(SizeType sz)
+	void Vector<Type>::resize(size_t sz)
 	{
-		if (sz > arrSize)
+		if (sz > mArrSize)
 		{
-			if (sz > initSize)
+			if (sz > mInitSize)
 			{
-				initSize = sz;
+				mInitSize = sz;
 				reallocate();
 			}
 		}
 		else
 		{
-			for (SizeType i = arrSize; i < sz; ++i)
-				arr[i].~Type();
+			for (size_t i = mArrSize; i < sz; ++i)
+				mArr[i].~Type();
 		}
 
-		arrSize = sz;
+		mArrSize = sz;
 	}
 
 	template <class Type>
-	void Vector<Type>::resize(SizeType _size, ConstReferenceType _ref)
+	void Vector<Type>::resize(size_t _size, const Type& _ref)
 	{
-		if (_size > arrSize)
+		if (_size > mArrSize)
 		{
-			if (_size > initSize)
+			if (_size > mInitSize)
 			{
-				initSize = _size;
+				mInitSize = _size;
 				reallocate();
 			}
 
-			for (SizeType i = arrSize; i < _size; ++i)
+			for (size_t i = mArrSize; i < _size; ++i)
 			{
-				arr[i] = _ref;
+				mArr[i] = _ref;
 			}
 		}
 		else
 		{
-			for (SizeType i = arrSize; i < _size; ++i)
-				arr[i].~Type();
+			for (size_t i = mArrSize; i < _size; ++i)
+				mArr[i].~Type();
 		}
 
-		arrSize = _size;
+		mArrSize = _size;
 	}
 
 	template <class Type>
-	void Vector<Type>::reserve(SizeType _size)
+	void Vector<Type>::reserve(size_t _size)
 	{
-		if (_size > initSize)
+		if (_size > mInitSize)
 		{
-			initSize = _size;
+			mInitSize = _size;
 			reallocate();
 		}
 	}
@@ -469,28 +447,28 @@ namespace bs
 	template <class Type>
 	void Vector<Type>::shrink_to_fit()
 	{
-		initSize = arrSize;
+		mInitSize = mArrSize;
 		reallocate();
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ReferenceType Vector<Type>::operator[] (typename Vector<Type>::SizeType index)
+	Type& Vector<Type>::operator[] (size_t index)
 	{
-		return arr[index];
+		return mArr[index];
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ConstReferenceType Vector<Type>::operator[] (typename Vector<Type>::SizeType index) const
+	const Type& Vector<Type>::operator[] (size_t index) const
 	{
-		return arr[index];
+		return mArr[index];
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ReferenceType Vector<Type>::at(SizeType index)
+	Type& Vector<Type>::at(size_t index)
 	{
-		if (index < arrSize)
+		if (index < mArrSize)
 		{
-			return arr[index];
+			return mArr[index];
 		}
 		else
 		{
@@ -499,11 +477,11 @@ namespace bs
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ConstReferenceType Vector<Type>::at(SizeType index) const
+	const Type& Vector<Type>::at(size_t index) const
 	{
-		if (index < arrSize)
+		if (index < mArrSize)
 		{
-			return arr[index];
+			return mArr[index];
 		}
 		else
 		{
@@ -512,103 +490,103 @@ namespace bs
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ReferenceType Vector<Type>::front()
+	Type& Vector<Type>::front()
 	{
-		return arr[0];
+		return mArr[0];
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ConstReferenceType Vector<Type>::front() const
+	const Type& Vector<Type>::front() const
 	{
-		return arr[0];
+		return mArr[0];
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ReferenceType Vector<Type>::back()
+	Type& Vector<Type>::back()
 	{
-		return arr[arrSize - 1];
+		return mArr[mArrSize - 1];
 	}
 
 	template <typename Type>
-	typename Vector<Type>::ConstReferenceType Vector<Type>::back() const
+	const Type& Vector<Type>::back() const
 	{
-		return arr[arrSize - 1];
+		return mArr[mArrSize - 1];
 	}
 
 
 	template <typename Type>
 	Type* Vector<Type>::data()
 	{
-		return arr;
+		return mArr;
 	}
 
 	template <typename Type>
 	const Type* Vector<Type>::data() const
 	{
-		return arr;
+		return mArr;
 	}
 
 	template <typename Type>
 	template <class ...Args>
 	void Vector<Type>::emplace_back(Args&& ...args)
 	{
-		if (arrSize == initSize)
+		if (mArrSize == mInitSize)
 		{
-			initSize <<= 2;
+			mInitSize <<= 2;
 			reallocate();
 		}
 
-		arr[arrSize] = bs::move(Type(bs::forward<Args>(args) ...));
-		++arrSize;
+		mArr[mArrSize] = std::move(Type(std::forward<Args>(args) ...));
+		++mArrSize;
 	}
 
 	template <typename Type>
-	void Vector<Type>::push_back(ConstReferenceType element)
+	void Vector<Type>::push_back(const Type& element)
 	{
-		if (arrSize == initSize)
+		if (mArrSize == mInitSize)
 		{
-			initSize <<= 2;
+			mInitSize <<= 2;
 			reallocate();
 		}
 
-		arr[arrSize] = element;
-		++arrSize;
+		mArr[mArrSize] = element;
+		++mArrSize;
 	}
 
 	template <typename Type>
 	void Vector<Type>::push_back(ValueType&& element)
 	{
-		if (arrSize == initSize)
+		if (mArrSize == mInitSize)
 		{
-			initSize <<= 2;
+			mInitSize <<= 2;
 			reallocate();
 		}
 
-		arr[arrSize] = bs::move(element);
-		++arrSize;
+		mArr[mArrSize] = std::move(element);
+		++mArrSize;
 	}
 
 	template <typename Type>
 	void Vector<Type>::pop_back()
 	{
-		--arrSize;
-		arr[arrSize].~Type();
+		--mArrSize;
+		mArr[mArrSize].~Type();
 	}
 
 	template <typename Type>
 	typename Vector<Type>::Iterator Vector<Type>::insert(ConstIterator it, ValueType&& element)
 	{
-		Iterator iter = &arr[it - arr];
-		if (arrSize == initSize)
+		Iterator iter = &mArr[it - mArr];
+		if (mArrSize == mInitSize)
 		{
-			initSize <<= 2;
+			mInitSize <<= 2;
 			reallocate();
 		}
 
-		memmove(iter + 1, iter, (arrSize - (it - arr)) * sizeof(Type));
+		memmove(iter + 1, iter, (mArrSize - (it - mArr)) * sizeof(Type));
 
 		(*iter) = element;
-		++arrSize;
+		++mArrSize;
 
 		return iter;
 	}
@@ -616,7 +594,7 @@ namespace bs
 	template <typename Type>
 	typename Vector<Type>::Iterator Vector<Type>::erase(typename Vector<Type>::ConstIterator first, typename Vector<Type>::ConstIterator last)
 	{
-		Iterator iter = &arr[first - arr];
+		Iterator iter = &mArr[first - mArr];
 		if (first == last)
 			return iter;
 
@@ -625,8 +603,8 @@ namespace bs
 			(*first).~Type();
 		}
 
-		memmove(iter, last, (arrSize - (last - arr)) * sizeof(Type));
-		arrSize -= last - first;
+		memmove(iter, last, (mArrSize - (last - mArr)) * sizeof(Type));
+		mArrSize -= last - first;
 
 		return iter;
 	}
@@ -634,27 +612,27 @@ namespace bs
 	template <typename Type>
 	void Vector<Type>::swap(Vector<Type>& other)
 	{
-		const size_t tmpSize = arrSize;
-		const size_t tmpInitSize = initSize;
-		const Type* tmp = arr;
+		const size_t tmpSize = mArrSize;
+		const size_t tmpInitSize = mInitSize;
+		const Type* tmp = mArr;
 
-		arrSize = other.arrSize;
-		initSize = other.initSize;
-		arr = other.arr;
+		mArrSize = other.mArrSize;
+		mInitSize = other.mInitSize;
+		mArr = other.mArr;
 
-		other.arrSize = tmpSize;
-		other.initSize = tmpInitSize;
-		other.arr = tmp;
+		other.mArrSize = tmpSize;
+		other.mInitSize = tmpInitSize;
+		other.mArr = tmp;
 	}
 
 	template <typename Type>
 	void Vector<Type>::clear()
 	{
-		for (SizeType i = 0; i < arrSize; ++i)
+		for (size_t i = 0; i < mArrSize; ++i)
 		{
-			arr[i].~Type();
+			mArr[i].~Type();
 		}
 
-		arrSize = 0;
+		mArrSize = 0;
 	}
 }
