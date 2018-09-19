@@ -247,7 +247,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::smallAlloc(UINT32 numElements, bool keepData)
+	void Array<Type>::smallAlloc(UINT32 elements, bool data)
 	{
 		Type* tmp = 0;
 
