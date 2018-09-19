@@ -247,7 +247,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::smallAlloc(UINT32 numElements, bool keepData)
+	void Array<Type>::smallAlloc(UINT32 elements, bool data)
 	{
 		Type* tmp = 0;
 
@@ -318,7 +318,7 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::setLength(UINT32 element)
+	bool Array<Type>::setLength(UINT32 elements)
 	{
 		if (elements > mMaxLength)
 		{
