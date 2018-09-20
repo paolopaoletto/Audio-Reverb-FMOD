@@ -611,7 +611,8 @@ namespace bs
 		TID_VectorField = 1180,
 		TID_ParticleVectorFieldSettings = 1181,
 		TID_ParticleGpuSimulationSettings = 1182,
-		TID_AudioReverb = 1183,
+		TID_AudioReverb = 1183, // Add New
+		TID_CAudioReverb = 1184, // Add New
 
 		// Moved from Engine layer
 		TID_CCamera = 30000,
@@ -699,6 +700,7 @@ namespace bs
 	typedef GameObjectHandle<CLightProbeVolume> HLightProbeVolume;
 	typedef GameObjectHandle<CAudioSource> HAudioSource;
 	typedef GameObjectHandle<CAudioListener> HAudioListener;
+	typedef GameObjectHandle<CAudioReverb> HAudioReverb; // Add New
 	typedef GameObjectHandle<CParticleSystem> HParticleSystem;
 
 	/** @} */
