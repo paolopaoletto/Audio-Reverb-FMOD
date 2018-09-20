@@ -59,6 +59,9 @@ namespace bs {
 		/** @copydoc AudioReverb::setWetLevel */
 		void setWetLevel(float level) override;
 
+		/** @copydoc AudioReverb::setReverbPreset */
+		void setReverbPreset(AudioReverbPreset preset);
+
 	private:
 		friend class FMODAudio;
 

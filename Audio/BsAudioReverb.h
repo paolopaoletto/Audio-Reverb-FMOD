@@ -11,12 +11,40 @@ namespace bs
 	*/
 
 	/** List of preset to apply for the reverb. */
-	enum class BS_SCRIPT_EXPORT(m:Audio) AudioReverbPreset {
-		SmallRoom,	/**< Small Room preset. */
-		MediumRoom,	/**< Medium Room preset. */
-		LargeRoom,	/**< Large Room preset. */
-		Forest,		/**< Forest preset. */
-		Bunker		/**< Bunker preset. */
+	enum class BS_SCRIPT_EXPORT(m:Audio) AudioReverbPreset 
+	{
+		/** Custom presets. */
+		SmallRoom,	 /**< Small Room preset. */
+		MediumRoom,	 /**< Medium Room preset. */
+		LargeRoom,	 /**< Large Room preset. */
+		ForestTrees, /**< Forest preset. */
+		Bunker,		 /**< Bunker preset. */
+		
+		/** FMOD presets. */
+		Off,
+		Generic,
+		PaddedCell,
+		Room,
+		BathRoom,
+		LivingRoom,
+		StoneRoom,
+		Auditorium,
+		ConcertHall,
+		Cave,
+		Arena,
+		Hangar,
+		CarpetteHallway,
+		Hallway,
+		StoneCorridor,
+		Alley,
+		Forest,
+		City,
+		Mountains,
+		Quarry,
+		Plain,
+		ParkingLot,
+		Sewerpipe,
+		Underwater
 	};
 
 	/** 
@@ -178,7 +206,7 @@ namespace bs
 		bool isReverbIR() const { return mIsReverbIR; }
 
 		/** Determines the reverb preset to use. */
-		void setReverbPreset(AudioReverbPreset preset);
+		virtual void setReverbPreset(AudioReverbPreset preset);
 
 		/** @copydoc setReverbPreset() */
 		AudioReverbPreset getReverbPreset() { return mPreset; }
