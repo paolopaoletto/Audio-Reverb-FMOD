@@ -60,7 +60,7 @@ namespace bs
 		AudioFormat mFormat;
 		AudioReadMode mReadMode;
 		bool mIs3D;
-		bool mIsIR;
+		bool mIsIR; // Add New
 		UINT32 mBitDepth;
 
 		/************************************************************************/
