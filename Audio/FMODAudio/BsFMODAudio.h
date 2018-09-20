@@ -103,7 +103,7 @@ namespace bs
 
 		Vector<FMODAudioListener*> mListeners;
 		UnorderedSet<FMODAudioSource*> mSources;
-		UnorderedSet<FMODAudioReverb*> mReverbs;
+		UnorderedSet<FMODAudioReverb*> mReverbs; // Add New
 
 		Vector<AudioDevice> mAllDevices;
 		AudioDevice mDefaultDevice;
