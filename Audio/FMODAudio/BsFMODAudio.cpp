@@ -199,11 +199,13 @@ namespace bs
 		mSources.erase(source);
 	}
 	
+	// Add New
 	void FMODAudio::_registerReverb(FMODAudioReverb* reverb) 
 	{
 		mReverbs.insert(reverb);
 	}
 	
+	// Add New
 	void FMODAudio::_unregisterReverb(FMODAudioReverb* reverb) 
 	{
 		mReverbs.erase(reverb);

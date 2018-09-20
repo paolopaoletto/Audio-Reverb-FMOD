@@ -100,7 +100,7 @@ namespace bs
 		virtual SPtr<AudioSource> createSource() = 0;
 
 		/** Creates a new AudioReverb. */
-		virtual SPtr<AudioReverb> createReverb() = 0;
+		virtual SPtr<AudioReverb> createReverb() = 0; // Add New
 
 		/** Stops playback of all sources started with Audio::play calls. */
 		void stopManualSources();

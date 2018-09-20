@@ -125,7 +125,7 @@ namespace bs
 				flags |= FMOD_2D;
 
 			if (isIR())
-				flags |= FMOD_OPENONLY;
+				flags |= FMOD_OPENONLY; // Add New
 
 			if (mDesc.format == AudioFormat::PCM)
 			{
@@ -277,6 +277,9 @@ namespace bs
 			flags |= FMOD_3D;
 		else
 			flags |= FMOD_2D;
+
+		if (isIR())
+			flags |= FMOD_OPENONLY; // Add New
 
 		if (mDesc.format == AudioFormat::PCM || mDesc.readMode == AudioReadMode::LoadCompressed)
 		{

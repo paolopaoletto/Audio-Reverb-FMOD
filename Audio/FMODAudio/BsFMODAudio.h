@@ -65,7 +65,7 @@ namespace bs
 		void _unregisterSource(FMODAudioSource* source);
 
 		//-----------------------------------------
-
+		// Add New
 		/** Register a new AudioReverb. Should be called on reverb creation. */
 		void _registerReverb(FMODAudioReverb* reverb);
 
@@ -90,7 +90,7 @@ namespace bs
 		SPtr<AudioSource> createSource() override;
 
 		/** @copydoc Audio::createReverb */
-		SPtr<AudioReverb> createReverb() override;
+		SPtr<AudioReverb> createReverb() override; // Add New
 
 		/** Rebuilds information about all listeners. Should be called when listener list changes. */
 		void rebuildListeners();

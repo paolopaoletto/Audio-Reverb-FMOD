@@ -46,10 +46,10 @@ namespace bs
 		void setBitDepth(UINT32 bitDepth) { mBitDepth = bitDepth; }
 
 		/** Checks if the clip is used for convolution reverb. */
-		bool getIsIR() { return mIsIR; }
+		bool getIsIR() { return mIsIR; } // Add New
 
 		/** Sets the clip for convolution reverb. */
-		void setIsIR(bool isir) { mIsIR = isir; }
+		void setIsIR(bool isir) { mIsIR = isir; } // Add New
 
 		// Note: Add options to resample to a different frequency
 
