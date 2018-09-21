@@ -202,43 +202,67 @@ namespace bs
 
 	void CAudioReverb::onDestroyed()
 	{
-
+		destroyInternal();
 	}
 
 	void CAudioReverb::onDisabled()
 	{
-
+		destroyInternal();
 	}
 
 	void CAudioReverb::onEnabled()
 	{
-
+		restoreInternal();
 	}
 
 	void CAudioReverb::onTransformChanged(TransformChangedFlags flags)
 	{
+		if (!SO()->getActive())
+			return;
 
+		if ((flags & (TCF_Parent | TCF_Transform)) != 0)
+			updateTransform();
 	}
 
 	void CAudioReverb::update()
 	{
-
+		// TODO: update position of the reverb. 
 	}
-
 
 	void CAudioReverb::restoreInternal()
 	{
+		if (mInternal == nullptr)
+			mInternal = AudioReverb::create();
 
+		mInternal->setSource(mSource);
+		mInternal->setIR(mIr);
+		mInternal->setWetVolume(mWetVolume);
+		mInternal->setDryVolume(mDryVolume);
+		mInternal->setDecayTime(mDecayTime);
+		mInternal->setEarlyDelay(mEarlyDelay);
+		mInternal->setLateDelay(mLateDelay);
+		mInternal->setHFReference(mHFReference);
+		mInternal->setHFDecayRatio(mHFDecayRatio);
+		mInternal->setDiffusion(mDiffusion);
+		mInternal->setDensity(mDensity);
+		mInternal->setLowShelfFrequencies(mLowShelfFrequencies);
+		mInternal->setLowShelfFrequencies(mLowShelfGain);
+		mInternal->setHighCut(mHighCut);
+		mInternal->setEarlyLateMix(mEarlyLateMix);
+		mInternal->setWetLevel(mWetLevel);
+		mInternal->setReverbPreset(mPreset);
+
+		updateTransform();
 	}
 
 	void CAudioReverb::destroyInternal()
 	{
-
+		mInternal = nullptr;
 	}
 
 	void CAudioReverb::updateTransform()
 	{
-
+		mInternal->setTransform(SO()->getTransform());
 	}
 
 	RTTITypeBase* CAudioReverb::getRTTIStatic()

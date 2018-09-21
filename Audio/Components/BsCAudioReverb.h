@@ -16,7 +16,7 @@ namespace bs
 	  * @note Wraps AudioReverb as a Component.
 	  */
 
-	class BS_CORE_EXPORT BS_SCRIPT_EXPORT(m:Audio, m:AudioReverb) CAudioReverb : public Component 
+	class BS_CORE_EXPORT BS_SCRIPT_EXPORT(m:Audio, n:AudioReverb) CAudioReverb : public Component 
 	{
 	public:
 		CAudioReverb(const HSceneObject& parent);
@@ -236,7 +236,7 @@ namespace bs
 		/************************************************************************/
 
 	public:
-		friend class AudioReverbRTTI;
+		friend class CAudioReverbRTTI;
 		static RTTITypeBase* getRTTIStatic();
 		RTTITypeBase* getRTTI() const override;
 
