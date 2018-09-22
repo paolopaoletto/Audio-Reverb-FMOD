@@ -269,9 +269,9 @@ namespace bs
 
 		bool mIsReverbIR = false;
 
-		float mMinDistance;
-		float mMaxDistance;
-		Vector3 mPosition;
+		float mMinDistance = 10.0f;
+		float mMaxDistance = 40.0f;
+		Vector3 mPosition = { -10.0f, 0.0f, 0.0f };
 
 		/************************************************************************/
 		/* 								RTTI		                     		*/
