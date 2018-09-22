@@ -211,6 +211,22 @@ namespace bs
 		/** @copydoc setReverbPreset() */
 		AudioReverbPreset getReverbPreset() { return mPreset; }
 
+		virtual void setPosition(Vector3 position);
+
+		Vector3 getPosition() { return mPosition; }
+
+		/** Determines the minimum distance of the reverb from the source. */
+		virtual void setMinDistance(float distance);
+
+		/** @copydoc setMinDistance() */
+		float getMinDistance(float distance) { return mMinDistance; };
+
+		/** Determines the maximum distance of the reverb from the source. */
+		virtual void setMaxDistance(float distance);
+
+		/** @copydoc setMaxDistance() */
+		float getMaxDistance(float distance) { return mMaxDistance; }
+
 		/** Creates a new audio reverb. */
 		static SPtr<AudioReverb> create();
 
@@ -250,6 +266,10 @@ namespace bs
 		AudioReverbPreset mPreset = AudioReverbPreset::SmallRoom;
 
 		bool mIsReverbIR = false;
+
+		float mMinDistance;
+		float mMaxDistance;
+		Vector3 mPosition;
 
 		/************************************************************************/
 		/* 								RTTI		                     		*/

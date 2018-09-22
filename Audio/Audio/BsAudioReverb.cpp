@@ -101,6 +101,21 @@ namespace bs {
 		mPreset = preset;
 	}
 
+	void AudioReverb::setPosition(Vector3 position)
+	{
+		mPosition = position;
+	}
+
+	void AudioReverb::setMinDistance(float distance)
+	{
+		mMinDistance = distance;
+	}
+
+	void AudioReverb::setMaxDistance(float distance)
+	{
+		mMaxDistance = distance;
+	}
+
 	SPtr<AudioReverb> AudioReverb::create() 
 	{
 		return gAudio().createReverb();
@@ -126,4 +141,5 @@ namespace bs {
 	{
 		return AudioReverb::getRTTIStatic();
 	}
+
 }
