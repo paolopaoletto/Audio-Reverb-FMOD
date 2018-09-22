@@ -36,19 +36,16 @@ namespace bs
 			BS_RTTI_MEMBER_PLAIN(mMaxDistance, 19)
 		BS_END_RTTI_MEMBERS
 	public:
-		const String& getRTTIName() override 
-		{
+		const String& getRTTIName() override {
 			static String name = "AudioReverb";
 			return name;
 		}
 
-		UINT32 getRTTIId() override 
-		{
+		UINT32 getRTTIId() override {
 			return TID_AudioReverb;
 		}
 
-		SPtr<IReflectable> newRTTIObject() override 
-		{
+		SPtr<IReflectable> newRTTIObject() override {
 			return AudioReverb::create();
 		}
 	};
