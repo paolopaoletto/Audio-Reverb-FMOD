@@ -211,8 +211,10 @@ namespace bs
 		/** @copydoc setReverbPreset() */
 		AudioReverbPreset getReverbPreset() { return mPreset; }
 
+		/** Set the position of the reverb. */
 		virtual void setPosition(Vector3 position);
 
+		/** @copydoc setPosition() */
 		Vector3 getPosition() { return mPosition; }
 
 		/** Determines the minimum distance of the reverb from the source. */
