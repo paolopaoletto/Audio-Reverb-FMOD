@@ -62,6 +62,15 @@ namespace bs {
 		/** @copydoc AudioReverb::setReverbPreset */
 		void setReverbPreset(AudioReverbPreset preset);
 
+		/** @copydoc AudioReverb::setPosition */
+		void setPosition(Vector3 position);
+
+		/** @copydoc AudioReverb::setMixDistance */
+		void setMinDistance(float distance);
+
+		/** @copydoc AudioReverb::setMaxDistance */
+		void setMaxDistance(float distance);
+
 	private:
 		friend class FMODAudio;
 
@@ -86,6 +95,10 @@ namespace bs {
 
 		FMOD::Reverb3D* reverb3D = nullptr;
 		FMOD_REVERB_PROPERTIES prop;
+
+		float minDistance;
+		float maxDistance;
+		Vector3 positionReverb;
 	};
 
 	/** @} */

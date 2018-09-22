@@ -37,7 +37,8 @@ namespace bs {
 		FMOD::System* fmod = gFMODAudio()._getFMOD();
 		//FMODAudioClip* fmodClip = static_cast<FMODAudioClip*>(mIr.get());
 		
-		if (isReverbIR() && clip != nullptr) {
+		if (AudioReverb::isReverbIR() && clip != nullptr) 
+		{
 			fmod->createChannelGroup("reverb", &reverbGroup);
 			fmod->createDSPByType(FMOD_DSP_TYPE_CONVOLUTIONREVERB, &reverbUnit);
 			reverbGroup->addDSP(FMOD_CHANNELCONTROL_DSP_TAIL, reverbUnit);
@@ -263,7 +264,28 @@ namespace bs {
 		}
 	}
 
-	void FMODAudioReverb::onClipChanged() 
+	void FMODAudioReverb::setPosition(Vector3 position)
+	{
+		AudioReverb::setPosition(position);
+
+		positionReverb = mPosition;
+	}
+
+	void FMODAudioReverb::setMinDistance(float distance)
+	{
+		AudioReverb::setMinDistance(distance);
+
+		minDistance = mMinDistance;
+	}
+
+	void FMODAudioReverb::setMaxDistance(float distance)
+	{
+		AudioReverb::setMaxDistance(distance);
+
+		maxDistance = mMaxDistance;
+	}
+
+	void FMODAudioReverb::onClipChanged()
 	{
 	
 	}
