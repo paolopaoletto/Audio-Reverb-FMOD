@@ -37,8 +37,7 @@ namespace bs {
 		FMOD::System* fmod = gFMODAudio()._getFMOD();
 		//FMODAudioClip* fmodClip = static_cast<FMODAudioClip*>(mIr.get());
 		
-		if (AudioReverb::isReverbIR() && clip != nullptr) 
-		{
+		if (AudioReverb::isReverbIR() && clip != nullptr) {
 			fmod->createChannelGroup("reverb", &reverbGroup);
 			fmod->createDSPByType(FMOD_DSP_TYPE_CONVOLUTIONREVERB, &reverbUnit);
 			reverbGroup->addDSP(FMOD_CHANNELCONTROL_DSP_TAIL, reverbUnit);
