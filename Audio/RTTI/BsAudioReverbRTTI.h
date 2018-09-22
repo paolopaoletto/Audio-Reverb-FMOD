@@ -9,7 +9,8 @@ namespace bs
 	*  @{
 	*/
 
-	class BS_CORE_EXPORT AudioReverbRTTI : public RTTIType<AudioReverb, IReflectable, AudioReverbRTTI> {
+	class BS_CORE_EXPORT AudioReverbRTTI : public RTTIType<AudioReverb, IReflectable, AudioReverbRTTI> 
+	{
 	private:
 		BS_BEGIN_RTTI_MEMBERS
 			BS_RTTI_MEMBER_PLAIN(mWetVolume, 0)
@@ -30,18 +31,24 @@ namespace bs
 			BS_RTTI_MEMBER_REFL(mIr, 14)
 			BS_RTTI_MEMBER_PLAIN(mPreset, 15)
 			BS_RTTI_MEMBER_PLAIN(mIsReverbIR, 16)
+			BS_RTTI_MEMBER_PLAIN(mPosition, 17)
+			BS_RTTI_MEMBER_PLAIN(mMinDistance, 18)
+			BS_RTTI_MEMBER_PLAIN(mMaxDistance, 19)
 		BS_END_RTTI_MEMBERS
 	public:
-		const String& getRTTIName() override {
+		const String& getRTTIName() override 
+		{
 			static String name = "AudioReverb";
 			return name;
 		}
 
-		UINT32 getRTTIId() override {
+		UINT32 getRTTIId() override 
+		{
 			return TID_AudioReverb;
 		}
 
-		SPtr<IReflectable> newRTTIObject() override {
+		SPtr<IReflectable> newRTTIObject() override 
+		{
 			return AudioReverb::create();
 		}
 	};
