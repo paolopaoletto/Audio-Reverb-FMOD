@@ -152,7 +152,7 @@ namespace bs
 		Vector<OAAudioListener*> mListeners;
 		Vector<ALCcontext*> mContexts;
 		UnorderedSet<OAAudioSource*> mSources;
-		UnorderedSet<OAAudioSource*> mReverbs; // Add New
+		UnorderedSet<OAAudioReverb*> mReverbs; // Add New
 
 		// Streaming thread
 		Vector<StreamingCommand> mStreamingCommandQueue;
