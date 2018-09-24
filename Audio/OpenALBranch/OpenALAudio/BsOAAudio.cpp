@@ -4,6 +4,7 @@
 #include "BsOAAudioClip.h"
 #include "BsOAAudioListener.h"
 #include "BsOAAudioSource.h"
+#include "BsOAAudioReverb.h"
 #include "Math/BsMath.h"
 #include "Threading/BsTaskScheduler.h"
 #include "Audio/BsAudioUtility.h"
@@ -172,6 +173,18 @@ namespace bs
 		mSources.erase(source);
 	}
 
+	// Add New
+	void OAAudio::_registerReverb(OAAudioReverb* reverb) 
+	{
+		mReverbs.insert(reverb);
+	}
+
+	// Add New
+	void OAAudio::_unregisterReverb(OAAudioReverb* reverb) 
+	{
+		mReverbs.erase(reverb);
+	}
+
 	void OAAudio::startStreaming(OAAudioSource* source)
 	{
 		Lock lock(mMutex);
@@ -222,6 +235,11 @@ namespace bs
 	SPtr<AudioSource> OAAudio::createSource()
 	{
 		return bs_shared_ptr_new<OAAudioSource>();
+	}
+
+	SPtr<AudioReverb> OAAudio::createReverb() 
+	{
+		return bs_shared_ptr_new<OAAudioReverb>();
 	}
 
 	void OAAudio::rebuildContexts()
