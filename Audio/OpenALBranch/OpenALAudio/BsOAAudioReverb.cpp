@@ -4,32 +4,32 @@ namespace bs
 {
 	OAAudioReverb::OAAudioReverb()
 	{
-
+		gOAAudio()._registerReverb(this);
 	}
 
 	OAAudioReverb::~OAAudioReverb()
 	{
-
+		gOAAudio()._unregisterReverb(this);
 	}
 
 	void OAAudioReverb::setSource(const HAudioSource& source)
 	{
-
+		
 	}
 
 	void OAAudioReverb::setIR(const HAudioClip& clip)
 	{
-
+		
 	}
 
 	void OAAudioReverb::setWetVolume(float volume)
 	{
-
+		
 	}
 
 	void OAAudioReverb::setDryVolume(float volume)
 	{
-
+		
 	}
 
 	void OAAudioReverb::setDecayTime(float time)
