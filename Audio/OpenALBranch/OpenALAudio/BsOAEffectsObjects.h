@@ -4,7 +4,7 @@
 
 namespace bs 
 {
-	/** Effect object functions */
+	/** Effect object functions. */
 	static LPALGENEFFECTS alGenEffects;
 	static LPALDELETEEFFECTS alDeleteEffects;
 	static LPALISEFFECT alIsEffect;
