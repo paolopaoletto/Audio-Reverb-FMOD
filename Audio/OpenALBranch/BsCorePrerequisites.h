@@ -350,6 +350,7 @@ namespace bs
 	class ShaderImportOptions;
 	class AudioListener;
 	class AudioSource;
+	class AudioReverb; // Add New
 	class AudioClipImportOptions;
 	class AnimationClip;
 	class CCamera;
@@ -359,6 +360,7 @@ namespace bs
 	class CBone;
 	class CAudioSource;
 	class CAudioListener;
+	class CAudioReverb;
 	class GpuPipelineParamInfo;
 	template <class T> class TAnimationCurve;
 	struct AnimationCurves;
@@ -612,8 +614,8 @@ namespace bs
 		TID_ParticleVectorFieldSettings = 1181,
 		TID_ParticleGpuSimulationSettings = 1182,
 		TID_ParticleDepthCollisionSettings = 1183,
-		TID_AudioReverb = 1184,
-		TID_CAudioReverb = 1185,
+		TID_AudioReverb = 1184, // Add New
+		TID_CAudioReverb = 1185, // Add New
 
 		// Moved from Engine layer
 		TID_CCamera = 30000,
@@ -701,6 +703,7 @@ namespace bs
 	typedef GameObjectHandle<CLightProbeVolume> HLightProbeVolume;
 	typedef GameObjectHandle<CAudioSource> HAudioSource;
 	typedef GameObjectHandle<CAudioListener> HAudioListener;
+	typedef GameObjectHandle<CAudioReverb> HAudioReverb; // Add New
 	typedef GameObjectHandle<CParticleSystem> HParticleSystem;
 
 	/** @} */
