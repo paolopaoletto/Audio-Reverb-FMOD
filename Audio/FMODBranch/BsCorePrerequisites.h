@@ -350,6 +350,7 @@ namespace bs
 	class ShaderImportOptions;
 	class AudioListener;
 	class AudioSource;
+	class AudioReverb; // Add New
 	class AudioClipImportOptions;
 	class AnimationClip;
 	class CCamera;
@@ -359,6 +360,7 @@ namespace bs
 	class CBone;
 	class CAudioSource;
 	class CAudioListener;
+	class CAudioReverb; // Add New
 	class GpuPipelineParamInfo;
 	template <class T> class TAnimationCurve;
 	struct AnimationCurves;
