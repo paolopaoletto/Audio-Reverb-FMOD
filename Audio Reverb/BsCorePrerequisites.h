@@ -360,7 +360,7 @@ namespace bs
 	class CBone;
 	class CAudioSource;
 	class CAudioListener;
-	class CAudioReverb;
+	class CAudioReverb; // Add New
 	class GpuPipelineParamInfo;
 	template <class T> class TAnimationCurve;
 	struct AnimationCurves;
