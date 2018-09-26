@@ -1,9 +1,12 @@
 #include "AL/efx.h"
+#include "AL/efx-presets.h"
 
 #define AL_GET_PROC_ADDRESS(f, ptr) ((f) = (ptr)alGetProcAddress(#f))
 
 namespace bs 
 {
+	typedef EFXEAXREVERBPROPERTIES ReverbPreset;
+
 	/** Effect object functions. */
 	static LPALGENEFFECTS alGenEffects;
 	static LPALDELETEEFFECTS alDeleteEffects;

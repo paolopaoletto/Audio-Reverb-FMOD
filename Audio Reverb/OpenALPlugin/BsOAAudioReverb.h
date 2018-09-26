@@ -120,10 +120,6 @@ namespace bs
 		/** @copydoc AudioReverb::setMaxDistance */
 		void setMaxDistance(float distance);
 
-		/*
-		* Methods in addition to those in common with FMOD. 
-		*/
-
 	private:
 		friend class OAAudio;
 
@@ -134,6 +130,8 @@ namespace bs
 		UINT32 mEffects;
 		UINT32 mSlot;
 		
+		ReverbPreset preset;
+
 		float minDistance;
 		float maxDistance;
 		Vector3 positionReverb;
