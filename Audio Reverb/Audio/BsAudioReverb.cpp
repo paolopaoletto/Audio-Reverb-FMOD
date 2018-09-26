@@ -36,31 +36,6 @@ namespace bs {
 		mDryVolume = volume;
 	}
 
-	void AudioReverb::setDecayTime(float time)
-	{
-		mDecayTime = time;
-	}
-
-	void AudioReverb::setEarlyDelay(float delay)
-	{
-		mEarlyDelay = delay;
-	}
-
-	void AudioReverb::setLateDelay(float delay)
-	{
-		mLateDelay = delay;
-	}
-
-	void AudioReverb::setHFReference(float hfref)
-	{
-		mHFReference = hfref;
-	}
-
-	void AudioReverb::setHFDecayRatio(float ratio)
-	{
-		mHFDecayRatio = ratio;
-	}
-
 	void AudioReverb::setDiffusion(float diffusion)
 	{
 		mDiffusion = diffusion;
@@ -71,14 +46,94 @@ namespace bs {
 		mDensity = density;
 	}
 
-	void AudioReverb::setLowShelfFrequencies(float freq)
+	void AudioReverb::setGain(float gain) 
 	{
-		mLowShelfFrequencies = freq;
+		mGain = gain;
 	}
 
-	void AudioReverb::setLowShelfGain(float gain)
+	void AudioReverb::setGainHF(float gain) 
 	{
-		mLowShelfGain = gain;
+		mGainHF = gain;
+	}
+
+	void AudioReverb::setGainLF(float gain) 
+	{
+		mGainLF = gain;
+	}
+
+	void AudioReverb::setDecayTime(float time)
+	{
+		mDecayTime = time;
+	}
+
+	void AudioReverb::setDecayHFRatio(float ratio) 
+	{
+		mDecayHFRatio = ratio;
+	}
+
+	void AudioReverb::setDecayLFRatio(float ratio) 
+	{
+		mDecayLFRatio = ratio;
+	}
+
+	void AudioReverb::setReflectionGain(float gain) 
+	{
+		mReflectionGain = gain;
+	}
+
+	void AudioReverb::setReflectionDelay(float delay) 
+	{
+		mReflectionDelay = delay;
+	}
+
+	void AudioReverb::setReflectionPan(Vector3 pan) 
+	{
+		mReflectionPan = pan;
+	}
+
+	void AudioReverb::setLateReverbGain(float gain) 
+	{
+		mLateReverbGain = gain;
+	}
+
+	void AudioReverb::setLateReverbDelay(float delay) 
+	{
+		mLateReverbDelay = delay;
+	}
+
+	void AudioReverb::setLateReverbPan(Vector3 pan) 
+	{
+		mLateReverbPan = pan;
+	}
+
+	void AudioReverb::setEchoTime(float time) 
+	{
+		mEchoTime = time;
+	}
+
+	void AudioReverb::setEchoDepth(float depth) 
+	{
+		mEchoDepth = depth;
+	}
+
+	void AudioReverb::setModulationTime(float time) 
+	{
+		mModulationTime = time;
+	}
+
+	void AudioReverb::setModulationDepth(float depth) 
+	{
+		mModulationDepth = depth;
+	}
+
+	void AudioReverb::setHFReference(float hfref)
+	{
+		mHFReference = hfref;
+	}
+
+	void AudioReverb::setLFReference(float hfref) 
+	{
+		mLFReference = hfref;
 	}
 
 	void AudioReverb::setHighCut(float freq)
@@ -94,6 +149,21 @@ namespace bs {
 	void AudioReverb::setWetLevel(float level)
 	{
 		mWetLevel = level;
+	}
+
+	void AudioReverb::setRoomRolloffFactor(float factor) 
+	{
+		mRoomRolloffFactor = factor;
+	}
+
+	void AudioReverb::setAirAbsorptionGainHF(float gain) 
+	{
+		mAirAbsorptionGainHF = gain;
+	}
+
+	void AudioReverb::setDecayHFLimit(bool limit) 
+	{
+		mDecayHFLimit = limit;
 	}
 
 	void AudioReverb::setReverbPreset(AudioReverbPreset preset)

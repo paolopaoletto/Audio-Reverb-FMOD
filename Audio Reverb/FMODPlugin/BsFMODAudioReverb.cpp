@@ -62,41 +62,6 @@ namespace bs {
 		AudioReverb::setDryVolume(volume);
 	}
 
-	void FMODAudioReverb::setDecayTime(float time)
-	{
-		AudioReverb::setDecayTime(time);
-		
-		prop.DecayTime = mDecayTime;
-	}
-
-	void FMODAudioReverb::setEarlyDelay(float delay)
-	{
-		AudioReverb::setEarlyDelay(delay);
-
-		prop.EarlyDelay = mEarlyDelay;
-	}
-
-	void FMODAudioReverb::setLateDelay(float delay)
-	{
-		AudioReverb::setLateDelay(delay);
-
-		prop.LateDelay = mLateDelay;
-	}
-
-	void FMODAudioReverb::setHFReference(float hfref)
-	{
-		AudioReverb::setHFReference(hfref);
-
-		prop.HFReference = mHFReference;
-	}
-
-	void FMODAudioReverb::setHFDecayRatio(float ratio)
-	{
-		AudioReverb::setHFDecayRatio(ratio);
-
-		prop.HFDecayRatio = mHFDecayRatio;
-	}
-
 	void FMODAudioReverb::setDiffusion(float diffusion)
 	{
 		AudioReverb::setDiffusion(diffusion);
@@ -111,18 +76,100 @@ namespace bs {
 		prop.Density = mDensity;
 	}
 
-	void FMODAudioReverb::setLowShelfFrequencies(float freq)
+	void FMODAudioReverb::setGain(float gain)
 	{
-		AudioReverb::setLowShelfFrequencies(freq);
 
-		prop.LowShelfFrequency = mLowShelfFrequencies;
 	}
 
-	void FMODAudioReverb::setLowShelfGain(float gain)
+	void FMODAudioReverb::setGainHF(float gain)
 	{
-		AudioReverb::setLowShelfGain(gain);
 
-		prop.LowShelfGain = mLowShelfGain;
+	}
+
+	void FMODAudioReverb::setGainLF(float gain)
+	{
+
+	}
+
+	void FMODAudioReverb::setDecayTime(float time)
+	{
+		AudioReverb::setDecayTime(time);
+
+		prop.DecayTime = mDecayTime;
+	}
+
+	void FMODAudioReverb::setDecayHFRatio(float ratio)
+	{
+
+	}
+
+	void FMODAudioReverb::setDecayLFRatio(float ratio)
+	{
+
+	}
+
+	void FMODAudioReverb::setReflectionGain(float gain)
+	{
+
+	}
+
+	void FMODAudioReverb::setReflectionDelay(float delay)
+	{
+
+	}
+
+	void FMODAudioReverb::setReflectionPan(Vector3 pan)
+	{
+
+	}
+
+	void FMODAudioReverb::setLateReverbGain(float gain)
+	{
+
+	}
+
+	void FMODAudioReverb::setLateReverbDelay(float delay)
+	{
+
+	}
+
+	void FMODAudioReverb::setLateReverbPan(Vector3 pan)
+	{
+
+	}
+
+	void FMODAudioReverb::setEchoTime(float time)
+	{
+
+	}
+
+	void FMODAudioReverb::setEchoDepth(float depth)
+	{
+
+	}
+
+	void FMODAudioReverb::setModulationTime(float time)
+	{
+
+	}
+
+	void FMODAudioReverb::setModulationDepth(float depth)
+	{
+
+	}
+
+
+	void FMODAudioReverb::setHFReference(float hfref)
+	{
+		AudioReverb::setHFReference(hfref);
+
+		prop.HFReference = mHFReference;
+	}
+
+
+	void FMODAudioReverb::setLFReference(float hfref)
+	{
+
 	}
 
 	void FMODAudioReverb::setHighCut(float freq)
@@ -146,7 +193,22 @@ namespace bs {
 		prop.WetLevel = mWetLevel;
 	}
 
-	void FMODAudioReverb::setReverbPreset(AudioReverbPreset preset) 
+	void FMODAudioReverb::setRoomRolloffFactor(float factor)
+	{
+
+	}
+
+	void FMODAudioReverb::setAirAbsorptionGainHF(float gain)
+	{
+
+	}
+
+	void FMODAudioReverb::setDecayHFLimit(bool limit)
+	{
+
+	}
+
+	void FMODAudioReverb::setReverbPreset(AudioReverbPreset preset)
 	{
 		AudioReverb::setReverbPreset(preset);
 

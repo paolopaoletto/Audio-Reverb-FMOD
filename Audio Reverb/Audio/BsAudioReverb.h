@@ -98,6 +98,36 @@ namespace bs
 
 		/** @copydoc setDryVolume() */
 		float getDryVolume() const { return mDryVolume; }
+		
+		/** Determines the diffusion of the reverb. */
+		virtual void setDiffusion(float diffusion);
+
+		/** @copydoc setDiffusion() */
+		float getDiffusion() const { return mDiffusion; }
+
+		/** Determines the density of the reverb. */
+		virtual void setDensity(float density);
+
+		/** @copydoc setDensity() */
+		float getDensity() const { return mDensity; }
+
+		/** Determines the gain of the reverb. */
+		virtual void setGain(float gain);
+
+		/** @copydoc setGain() */
+		float getGain() const { return mGain; }
+
+		/** Determines the gain at high frequencies. */
+		virtual void setGainHF(float gain);
+
+		/** @copydoc setGainHF() */
+		float getGainHF() const { return mGainHF; }
+
+		/** Determines the gain at low frequencies. */
+		virtual void setGainLF(float gain); 
+
+		/** @copydoc setGainLF() */
+		float getGainLF() const { return mGainLF; }
 
 		/** Determines the reverberation decay time in ms unit measure. */
 		virtual void setDecayTime(float time);
@@ -105,71 +135,89 @@ namespace bs
 		/** @copydoc setDecayTime() */
 		float getDecayTime() const { return mDecayTime; }
 
-		/**
-		* Determines the initial reflection delay time
-		* in ms unit measure.
-		*/
-		virtual void setEarlyDelay(float delay);
+		/** Determines the decay ratio at high frequencies. */
+		virtual void setDecayHFRatio(float ratio);
 
-		/** @copydoc setEarlyDelay() */
-		float getEarlyDelay() const { return mEarlyDelay; }
+		/** @copydoc setDecayHFRatio() */
+		float getDecayHFRatio() const { return mDecayHFRatio; }
 
-		/**
-		* Determines the late reverberation delay time relative to initial reflection
-		* in ms unit measure.
-		*/
-		virtual void setLateDelay(float delay);
+		/** Determines the decay ratio at low frequencies. */
+		virtual void setDecayLFRatio(float ratio);
 
-		/** @copydoc setLateDelay() */
-		float getLateDelay() const { return mLateDelay; }
+		/** @copydoc setDecayLFRatio() */
+		float getDecayLFRatio() const { return mDecayLFRatio; }
 
-		/** Determines the high frequencies of the reverb in unit Hz unit measure. */
+		/** Determines the reflection gain of the reverb. */
+		virtual void setReflectionGain(float gain);
+
+		/** @copydoc setReflectionGain() */
+		float getReflectionGain() const { return mReflectionGain; }
+
+		/** Determines the reflection delay of the reverb. */
+		virtual void setReflectionDelay(float delay);
+
+		/** @copydoc setReflectionDelay() */
+		float getReflectionDelay() const { return mReflectionDelay; }
+
+		/** Determines the reflection pan of the reverb. */
+		virtual void setReflectionPan(Vector3 pan);
+
+		/** @copydoc setReflectionPan() */
+		Vector3 getReflectionPan() const { return mReflectionPan; }
+
+		/** Determines the late reflection gain of the reverb. */
+		virtual void setLateReverbGain(float gain);
+
+		/** @copydoc setLateReverbGain() */
+		float getLateReverbGain() const { return mLateReverbGain; }
+
+		/** Determines the late reflection delay of the reverb. */
+		virtual void setLateReverbDelay(float delay);
+
+		/** @copydoc setLateReverbDelay() */
+		float setLateReverbDelay() const { return mLateReverbDelay; }
+
+		/** Determines the late reflection pan of the reverb. */
+		virtual void setLateReverbPan(Vector3 pan);
+
+		/** @copydoc setLateReverbPan() */
+		Vector3 getLateReverbPan() const { return mLateReverbPan; }
+
+		/** Determines the echo time of the reverb. */
+		virtual void setEchoTime(float time);
+
+		/** @copydoc setEchoTime() */
+		float getEchoTime() const { return mEchoTime; }
+
+		/** Determines the echo depth of the reverb. */
+		virtual void setEchoDepth(float depth);
+
+		/** @copydoc setEchoDepth() */
+		float getEchoDepth() const { return mEchoDepth; }
+
+		/** Determines the modulation time of the reverb. */
+		virtual void setModulationTime(float time);
+
+		/** @copydoc setModulationTime() */
+		float getModulationTime() const { return mModulationTime; }
+
+		/** Determines the modulation depth of the reverb. */
+		virtual void setModulationDepth(float depth);
+
+		/** @copydoc setModulationDepth() */
+		float getModulationDepth() const { return mModulationDepth; }
+
+		/** Determines the reference at high frequencies. */
 		virtual void setHFReference(float hfref);
 
 		/** @copydoc setHFReference() */
 		float getHFReference() const { return mHFReference; }
 
-		/**
-		* Determines the high-frequency to mid-frequency decay time ratio
-		* in % unit measure.
-		*/
-		virtual void setHFDecayRatio(float ratio);
+		/** Determines the reference at low frequencies. */
+		virtual void setLFReference(float freq);
 
-		/** @copydoc setHFDecayRatio() */
-		float getHFDecayRatio() const { return mHFDecayRatio; }
-
-		/**
-		* Determines the value that controls the space density in the late reverberation decay.
-		* in % unit measure.
-		**/
-		virtual void setDiffusion(float diffusion);
-
-		/** @copydoc setDiffusion() */
-		float getDiffusion() const { return mDiffusion; }
-
-		/**
-		* Value that controls the modal density in the late reverberation decay.
-		* in % unit measure.
-		*/
-		virtual void setDensity(float density);
-
-		/** @copydoc setDensity() */
-		float getDensity() const { return mDensity; }
-
-		/** Determines the low frequency of the reverb in Hz unit measure. */
-		virtual void setLowShelfFrequencies(float freq);
-
-		/** @copydoc setLowShelfFrequencies() */
-		float getLowShelfFrequencies() const { return mLowShelfFrequencies; }
-
-		/**
-		* Determines the relative space level in the low frequencies
-		* in dB unit measure.
-		*/
-		virtual void setLowShelfGain(float gain);
-
-		/** @copydoc setLowShelfGain() */
-		float getLowShelfGain() const { return mLowShelfGain; }
+		/** @copydoc setLFReference() */
+		float setLFReference() const { return mLFReference; }
 
 		/**
 		* Determines the relative space level at high frequencies
@@ -197,6 +245,24 @@ namespace bs
 
 		/** @copydoc setWetLevel() */
 		float getWetLevel() const { return mWetLevel; }
+
+		/** Determines the Room Rooloff Factor of the reverb. */
+		virtual void setRoomRolloffFactor(float factor);
+
+		/** @copydoc setRoomRolloffFactor() */
+		float setRoomRolloffFactor() const { return mRoomRolloffFactor; }
+
+		/** Determines the air absorption gain at high frequencies. */
+		virtual void setAirAbsorptionGainHF(float gain);
+		
+		/** @copydoc setAirAbsorptionGainHF() */
+		float getAirAbsorptionGainHF() const { return mAirAbsorptionGainHF; }
+
+		/** Determines the decay limit at high frequencies. */
+		virtual void setDecayHFLimit(bool limit); 
+
+		/** @copydoc setDecayHFLimit() */
+		bool getDecayHFLimit() const { return mDecayHFLimit; }
 
 		/**
 		* Boolean to determines which reverb to use.
@@ -247,19 +313,34 @@ namespace bs
 		float mWetVolume = 1.0f;
 		float mDryVolume = 1.0f;
 
-		struct {
-			float mDecayTime = 500.0f;
-			float mEarlyDelay = 5.0f;
-			float mLateDelay = 9.0f;
-			float mHFReference = 5000.f;
-			float mHFDecayRatio = 40.0f;
+		struct 
+		{
 			float mDiffusion = 100.0f;
-			float mDensity = 100.0f;
-			float mLowShelfFrequencies = 250.0f;
-			float mLowShelfGain = 10.0f;
+			float mDensity = 100.f;
+			float mGain = 0.32f;
+			float mGainHF = 0.89f;
+			float mGainLF = 0.0f;
+			float mDecayTime = 1.1f;
+			float mDecayHFRatio = 0.83f;
+			float mDecayLFRatio = 1.0f;
+			float mReflectionGain = 0.05f;
+			float mReflectionDelay = 0.007f;
+			Vector3 mReflectionPan = Vector3::ZERO;
+			float mLateReverbGain = 1.26f;
+			float mLateReverbDelay = 0.01f;
+			Vector3 mLateReverbPan = Vector3::ZERO;
+			float mEchoTime = 0.25f;
+			float mEchoDepth = 0.0f;
+			float mModulationTime = 0.25f;
+			float mModulationDepth = 0.0f;
+			float mHFReference = 5000.0f;
+			float mLFReference = 250.0f;
 			float mHighCut = 20000.0f;
 			float mEarlyLateMix = 50.0f;
 			float mWetLevel = -8.0f;
+			float mRoomRolloffFactor = 1.0f;
+			float mAirAbsorptionGainHF = 0.994f;
+			bool mDecayHFLimit = true;
 		};
 
 		HAudioSource mSource;
