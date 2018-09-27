@@ -78,17 +78,17 @@ namespace bs {
 
 	void FMODAudioReverb::setGain(float gain)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setGainHF(float gain)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setGainLF(float gain)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setDecayTime(float time)
@@ -110,7 +110,7 @@ namespace bs {
 
 	void FMODAudioReverb::setReflectionGain(float gain)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setReflectionDelay(float delay)
@@ -120,12 +120,12 @@ namespace bs {
 
 	void FMODAudioReverb::setReflectionPan(Vector3 pan)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setLateReverbGain(float gain)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setLateReverbDelay(float delay)
@@ -135,27 +135,27 @@ namespace bs {
 
 	void FMODAudioReverb::setLateReverbPan(Vector3 pan)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setEchoTime(float time)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setEchoDepth(float depth)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setModulationTime(float time)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setModulationDepth(float depth)
 	{
-
+		// OpenAL Features.
 	}
 
 
@@ -195,17 +195,17 @@ namespace bs {
 
 	void FMODAudioReverb::setRoomRolloffFactor(float factor)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setAirAbsorptionGainHF(float gain)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setDecayHFLimit(bool limit)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setReverbPreset(AudioReverbPreset preset)
