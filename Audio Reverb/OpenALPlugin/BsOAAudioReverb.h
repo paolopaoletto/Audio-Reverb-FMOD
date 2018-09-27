@@ -130,7 +130,7 @@ namespace bs
 		UINT32 mEffects;
 		UINT32 mSlot;
 		
-		ReverbPreset preset;
+		ReverbPreset mReverbPreset;
 
 		float minDistance;
 		float maxDistance;
