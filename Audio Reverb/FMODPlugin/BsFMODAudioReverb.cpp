@@ -105,7 +105,7 @@ namespace bs {
 
 	void FMODAudioReverb::setDecayLFRatio(float ratio)
 	{
-
+		// OpenAL Features.
 	}
 
 	void FMODAudioReverb::setReflectionGain(float gain)
