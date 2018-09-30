@@ -1,7 +1,7 @@
 #include "AL/efx.h"
 #include "AL/efx-presets.h"
 
-#define AL_GET_PROC_ADDRESS(f, ptr) ((f) = (ptr)alGetProcAddress(#f))
+#define BS_AL_GET_PROC_ADDRESS(f, ptr) ((f) = (ptr)alGetProcAddress(#f))
 
 namespace bs 
 {
@@ -32,4 +32,5 @@ namespace bs
 	static LPALGETAUXILIARYEFFECTSLOTIV alGetAuxiliaryEffectSlotiv;
 	static LPALGETAUXILIARYEFFECTSLOTF alGetAuxiliaryEffectSlotf;
 	static LPALGETAUXILIARYEFFECTSLOTFV alGetAuxiliaryEffectSlotfv;
+
 }

@@ -425,14 +425,36 @@ namespace bs
 		mInternal->setIR(mIr);
 		mInternal->setWetVolume(mWetVolume);
 		mInternal->setDryVolume(mDryVolume);
-		mInternal->setDecayTime(mDecayTime);
-		mInternal->setHFReference(mHFReference);
 		mInternal->setDiffusion(mDiffusion);
 		mInternal->setDensity(mDensity);
+		mInternal->setGain(mGain);
+		mInternal->setGainHF(mGainHF);
+		mInternal->setGainLF(mGainLF);
+		mInternal->setDecayTime(mDecayTime);
+		mInternal->setDecayHFRatio(mDecayHFRatio);
+		mInternal->setDecayLFRatio(mDecayLFRatio);
+		mInternal->setReflectionGain(mReflectionGain);
+		mInternal->setReflectionDelay(mReflectionDelay);
+		mInternal->setReflectionPan(mReflectionPan);
+		mInternal->setLateReverbGain(mLateReverbGain);
+		mInternal->setLateReverbDelay(mLateReverbDelay);
+		mInternal->setLateReverbPan(mLateReverbPan);
+		mInternal->setEchoTime(mEchoTime);
+		mInternal->setEchoDepth(mEchoDepth);
+		mInternal->setModulationTime(mModulationTime);
+		mInternal->setModulationDepth(mModulationDepth);
+		mInternal->setHFReference(mHFReference);
+		mInternal->setLFReference(mLFReference);
 		mInternal->setHighCut(mHighCut);
 		mInternal->setEarlyLateMix(mEarlyLateMix);
 		mInternal->setWetLevel(mWetLevel);
+		mInternal->setRoomRolloffFactor(mRoomRolloffFactor);
+		mInternal->setAirAbsorptionGainHF(mAirAbsorptionGainHF);
+		mInternal->setDecayHFLimit(mDecayHFLimit);
 		mInternal->setReverbPreset(mPreset);
+		mInternal->setPosition(mPosition);
+		mInternal->setMinDistance(mMinDistance);
+		mInternal->setMaxDistance(mMaxDistance);
 
 		updateTransform();
 	}

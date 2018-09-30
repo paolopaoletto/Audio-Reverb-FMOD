@@ -126,15 +126,19 @@ namespace bs
 		/** @copydoc IResourceListener::onClipChanged */
 		void onClipChanged() override;
 
+		/** Generate the object functions of the effects. */
+		void buildGenObjects();
+
+		/** Destroy the internal representaion of the audio reverb. */
+		void clear();
+
 		UINT32 mSource;
 		UINT32 mEffects;
 		UINT32 mSlot;
 		
 		ReverbPreset mReverbPreset;
 
-		float minDistance;
-		float maxDistance;
-		Vector3 positionReverb;
+		mutable Mutex mMutex;
 	};
 
 	/** @} */

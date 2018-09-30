@@ -5,10 +5,12 @@ namespace bs
 	OAAudioReverb::OAAudioReverb()
 	{
 		gOAAudio()._registerReverb(this);
+		buildGenObjects();
 	}
 
 	OAAudioReverb::~OAAudioReverb()
 	{
+		clear();
 		gOAAudio()._unregisterReverb(this);
 	}
 
@@ -305,5 +307,33 @@ namespace bs
 	{
 
 	}
+
+	void OAAudioReverb::buildGenObjects() 
+	{
+		// Get the effect object function
+		BS_AL_GET_PROC_ADDRESS(alGenEffects, LPALGENEFFECTS);
+		BS_AL_GET_PROC_ADDRESS(alDeleteEffects, LPALDELETEEFFECTS);
+		BS_AL_GET_PROC_ADDRESS(alIsEffect, LPALISEFFECT);
+		BS_AL_GET_PROC_ADDRESS(alEffecti, LPALEFFECTI);
+		BS_AL_GET_PROC_ADDRESS(alEffectiv, LPALEFFECTIV);
+		BS_AL_GET_PROC_ADDRESS(alEffectf, LPALEFFECTF);
+		BS_AL_GET_PROC_ADDRESS(alEffectfv, LPALEFFECTFV);
+
+		// Get the auxiliary effect slot object function
+		BS_AL_GET_PROC_ADDRESS(alGenAuxiliaryEffectSlots, LPALGENAUXILIARYEFFECTSLOTS);
+		BS_AL_GET_PROC_ADDRESS(alDeleteAuxiliaryEffectSlots, LPALDELETEAUXILIARYEFFECTSLOTS);
+		BS_AL_GET_PROC_ADDRESS(alIsAuxiliaryEffectSlot, LPALISAUXILIARYEFFECTSLOT);
+		BS_AL_GET_PROC_ADDRESS(alAuxiliaryEffectSloti, LPALAUXILIARYEFFECTSLOTI);
+		BS_AL_GET_PROC_ADDRESS(alAuxiliaryEffectSlotiv, LPALAUXILIARYEFFECTSLOTIV);
+		BS_AL_GET_PROC_ADDRESS(alAuxiliaryEffectSlotf, LPALAUXILIARYEFFECTSLOTF);
+		BS_AL_GET_PROC_ADDRESS(alAuxiliaryEffectSlotfv, LPALAUXILIARYEFFECTSLOTFV);
+	}
+
+	void OAAudioReverb::clear()
+	{
+		alDeleteAuxiliaryEffectSlots(1, &mSlot);
+		alDeleteEffects(1, &mEffects);
+	}
+
 
 }
