@@ -10,23 +10,22 @@ namespace bs {
 	FMODAudioReverb::~FMODAudioReverb() 
 	{
 		gFMODAudio()._unregisterReverb(this);
+
+		if (reverb3D != nullptr)
+			reverb3D->release();
 	}
 
 	void FMODAudioReverb::setSource(const HAudioSource& source) 
 	{
 		AudioReverb::setSource(source);
 
-		/** Temporary positions */
-		FMOD_VECTOR position = { -10.0f, 0.0f, 0.0f };
-
-		const float min = 10.0f;
-		const float max = 20.0f;
-
 		FMOD::System* fmod = gFMODAudio()._getFMOD();
-		if (!isReverbIR()) {
+
+		if (!AudioReverb::isReverbIR() && source != nullptr) 
+		{
 			fmod->createReverb3D(&reverb3D);
 			reverb3D->setProperties(&prop);
-			reverb3D->set3DAttributes(&position, min, max);
+			reverb3D->set3DAttributes(&positionReverb, minDistance, maxDistance);
 		}
 	}
 
@@ -37,7 +36,8 @@ namespace bs {
 		FMOD::System* fmod = gFMODAudio()._getFMOD();
 		//FMODAudioClip* fmodClip = static_cast<FMODAudioClip*>(mIr.get());
 		
-		if (AudioReverb::isReverbIR() && clip != nullptr) {
+		if (AudioReverb::isReverbIR() && clip != nullptr) 
+		{
 			fmod->createChannelGroup("reverb", &reverbGroup);
 			fmod->createDSPByType(FMOD_DSP_TYPE_CONVOLUTIONREVERB, &reverbUnit);
 			reverbGroup->addDSP(FMOD_CHANNELCONTROL_DSP_TAIL, reverbUnit);
@@ -100,7 +100,9 @@ namespace bs {
 
 	void FMODAudioReverb::setDecayHFRatio(float ratio)
 	{
+		AudioReverb::setDecayHFRatio(ratio);
 
+		prop.HFDecayRatio = mDecayHFRatio;
 	}
 
 	void FMODAudioReverb::setDecayLFRatio(float ratio)
@@ -115,7 +117,9 @@ namespace bs {
 
 	void FMODAudioReverb::setReflectionDelay(float delay)
 	{
+		AudioReverb::setReflectionDelay(delay);
 
+		prop.LateDelay = mLateReverbDelay;
 	}
 
 	void FMODAudioReverb::setReflectionPan(Vector3 pan)
@@ -130,7 +134,9 @@ namespace bs {
 
 	void FMODAudioReverb::setLateReverbDelay(float delay)
 	{
+		AudioReverb::setLateReverbDelay(delay);
 
+		prop.LateDelay = mLateReverbDelay;
 	}
 
 	void FMODAudioReverb::setLateReverbPan(Vector3 pan)
@@ -158,7 +164,6 @@ namespace bs {
 		// OpenAL Features.
 	}
 
-
 	void FMODAudioReverb::setHFReference(float hfref)
 	{
 		AudioReverb::setHFReference(hfref);
@@ -166,10 +171,11 @@ namespace bs {
 		prop.HFReference = mHFReference;
 	}
 
-
 	void FMODAudioReverb::setLFReference(float hfref)
 	{
+		AudioReverb::setLFReference(hfref);
 
+		prop.LowShelfFrequency = mLFReference;
 	}
 
 	void FMODAudioReverb::setHighCut(float freq)
@@ -329,7 +335,9 @@ namespace bs {
 	{
 		AudioReverb::setPosition(position);
 
-		positionReverb = mPosition;
+		positionReverb.x = mPosition.x;
+		positionReverb.y = mPosition.y;
+		positionReverb.z = mPosition.z;
 	}
 
 	void FMODAudioReverb::setMinDistance(float distance)

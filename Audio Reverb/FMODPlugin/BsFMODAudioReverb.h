@@ -6,7 +6,8 @@
 
 namespace bs {
 
-	class FMODAudioReverb : public AudioReverb {
+	class FMODAudioReverb : public AudioReverb 
+	{
 	public:
 		FMODAudioReverb();
 		virtual ~FMODAudioReverb();
@@ -140,7 +141,7 @@ namespace bs {
 
 		float minDistance;
 		float maxDistance;
-		Vector3 positionReverb;
+		FMOD_VECTOR positionReverb;
 	};
 
 	/** @} */
