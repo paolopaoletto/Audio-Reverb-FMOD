@@ -76,9 +76,6 @@ namespace bs
 
 		/** Returns an OpenAL context assigned to the provided listener. */
 		ALCcontext* _getContext(const OAAudioListener* listener) const;
-		
-		/** Return the OpenAL device pointer. */
-		ALCdevice* _getDevice() const { return mDevice; }; // Add New
 
 		/** 
 		 * Returns optimal format for the provided number of channels and bit depth. It is assumed the user has checked if
