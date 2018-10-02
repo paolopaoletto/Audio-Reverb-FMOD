@@ -140,7 +140,7 @@ namespace bs
 		UINT32 mSlot;
 		
 		UINT32 mAttribute[4] = { 0 };
-		UINT32 mSends = 0;
+		ALCint mSends = 0;
 
 		ReverbPreset mReverbPreset;
 

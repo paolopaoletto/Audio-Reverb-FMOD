@@ -17,6 +17,24 @@ namespace bs
 	void OAAudioReverb::setSource(const HAudioSource& source)
 	{
 		AudioReverb::setSource(source);
+
+		if (!gOAAudio()._isExtensionSupported("ALC_EXT_EFX"))
+			LOGERR("EAX is not supported on this current machine.");
+
+		auto device = gOAAudio()._getDevice();
+
+		mAttribute[0] = ALC_MAX_AUXILIARY_SENDS;
+		mAttribute[1] = 4;
+
+		alcGetIntegerv(device, ALC_MAX_AUXILIARY_SENDS, 1, &mSends);
+
+		auto& contexts = gOAAudio()._getContexts();
+		UINT32 numContexts = (UINT32)contexts.size();
+		for (UINT32 i = 0; i < numContexts; i++)
+		{
+			if (contexts.size() > 1)
+				alcMakeContextCurrent(contexts[i]);
+		}
 	}
 
 	void OAAudioReverb::setIR(const HAudioClip& clip)
