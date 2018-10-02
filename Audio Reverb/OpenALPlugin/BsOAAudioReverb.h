@@ -129,6 +129,9 @@ namespace bs
 		/** Generate the object functions of the effects. */
 		void buildGenObjects();
 
+		/** Rebuilds the internal representation of an audio reverb. */
+		void rebuild();
+
 		/** Destroy the internal representaion of the audio reverb. */
 		void clear();
 
@@ -136,6 +139,9 @@ namespace bs
 		UINT32 mEffects;
 		UINT32 mSlot;
 		
+		UINT32 mAttribute[4] = { 0 };
+		UINT32 mSends = 0;
+
 		ReverbPreset mReverbPreset;
 
 		mutable Mutex mMutex;

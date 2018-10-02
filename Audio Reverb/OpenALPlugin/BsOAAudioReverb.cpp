@@ -5,7 +5,7 @@ namespace bs
 	OAAudioReverb::OAAudioReverb()
 	{
 		gOAAudio()._registerReverb(this);
-		buildGenObjects();
+		rebuild();
 	}
 
 	OAAudioReverb::~OAAudioReverb()
@@ -39,6 +39,7 @@ namespace bs
 		AudioReverb::setDiffusion(diffusion);
 
 		mReverbPreset.flDiffusion = mDiffusion;
+		alEffectf(mEffects, AL_EAXREVERB_DIFFUSION, mReverbPreset.flDiffusion);
 	}
 
 	void OAAudioReverb::setDensity(float density)
@@ -46,6 +47,7 @@ namespace bs
 		AudioReverb::setDensity(density);
 
 		mReverbPreset.flDensity = mDensity;
+		alEffectf(mEffects, AL_EAXREVERB_DENSITY, mReverbPreset.flDensity);
 	}
 
 	void OAAudioReverb::setGain(float gain)
@@ -53,6 +55,7 @@ namespace bs
 		AudioReverb::setGain(gain);
 
 		mReverbPreset.flGain = mGain;
+		alEffectf(mEffects, AL_EAXREVERB_GAIN, mReverbPreset.flGain);
 	}
 
 	void OAAudioReverb::setGainHF(float gain)
@@ -60,6 +63,7 @@ namespace bs
 		AudioReverb::setGainHF(gain);
 
 		mReverbPreset.flGainHF = mGainHF;
+		alEffectf(mEffects, AL_EAXREVERB_GAINHF, mReverbPreset.flGainHF);
 	}
 
 	void OAAudioReverb::setGainLF(float gain)
@@ -67,6 +71,7 @@ namespace bs
 		AudioReverb::setGainLF(gain);
 
 		mReverbPreset.flGainLF = mGainLF;
+		alEffectf(mEffects, AL_EAXREVERB_GAINLF, mReverbPreset.flGainLF);
 	}
 
 	void OAAudioReverb::setDecayTime(float time)
@@ -74,6 +79,7 @@ namespace bs
 		AudioReverb::setDecayTime(time);
 
 		mReverbPreset.flDecayTime = mDecayTime;
+		alEffectf(mEffects, AL_EAXREVERB_DECAY_TIME, mReverbPreset.flDecayTime);
 	}
 
 	void OAAudioReverb::setDecayHFRatio(float ratio)
@@ -81,6 +87,7 @@ namespace bs
 		AudioReverb::setDecayHFRatio(ratio);
 
 		mReverbPreset.flDecayHFRatio = mDecayHFRatio;
+		alEffectf(mEffects, AL_EAXREVERB_DECAY_HFRATIO, mReverbPreset.flDecayHFRatio);
 	}
 
 	void OAAudioReverb::setDecayLFRatio(float ratio)
@@ -88,6 +95,7 @@ namespace bs
 		AudioReverb::setDecayLFRatio(ratio);
 
 		mReverbPreset.flDecayLFRatio = mDecayLFRatio;
+		alEffectf(mEffects, AL_EAXREVERB_DECAY_LFRATIO, mReverbPreset.flDecayLFRatio);
 	}
 
 	void OAAudioReverb::setReflectionGain(float gain)
@@ -95,6 +103,7 @@ namespace bs
 		AudioReverb::setReflectionGain(gain);
 
 		mReverbPreset.flReflectionsGain = mReflectionGain;
+		alEffectf(mEffects, AL_EAXREVERB_REFLECTIONS_GAIN, mReverbPreset.flReflectionsGain);
 	}
 
 	void OAAudioReverb::setReflectionDelay(float delay)
@@ -102,6 +111,7 @@ namespace bs
 		AudioReverb::setReflectionDelay(delay);
 
 		mReverbPreset.flReflectionsDelay = mReflectionDelay;
+		alEffectf(mEffects, AL_EAXREVERB_REFLECTIONS_DELAY, mReverbPreset.flLateReverbDelay);
 	}
 
 	void OAAudioReverb::setReflectionPan(Vector3 pan)
@@ -111,6 +121,7 @@ namespace bs
 		mReverbPreset.flReflectionsPan[0] = mReflectionPan.x;
 		mReverbPreset.flReflectionsPan[1] = mReflectionPan.y;
 		mReverbPreset.flReflectionsPan[2] = mReflectionPan.z;
+		alEffectf(mEffects, AL_EAXREVERB_REFLECTIONS_PAN, (*mReverbPreset.flReflectionsPan));
 	}
 
 	void OAAudioReverb::setLateReverbGain(float gain)
@@ -118,6 +129,7 @@ namespace bs
 		AudioReverb::setLateReverbGain(gain);
 
 		mReverbPreset.flLateReverbGain = mLateReverbGain;
+		alEffectf(mEffects, AL_EAXREVERB_LATE_REVERB_GAIN, mReverbPreset.flLateReverbGain);
 	}
 
 	void OAAudioReverb::setLateReverbDelay(float delay)
@@ -125,6 +137,7 @@ namespace bs
 		AudioReverb::setLateReverbDelay(delay);
 
 		mReverbPreset.flLateReverbDelay = mLateReverbDelay;
+		alEffectf(mEffects, AL_EAXREVERB_LATE_REVERB_DELAY, mReverbPreset.flLateReverbDelay);
 	}
 
 	void OAAudioReverb::setLateReverbPan(Vector3 pan)
@@ -134,6 +147,7 @@ namespace bs
 		mReverbPreset.flLateReverbPan[0] = mLateReverbPan.x;
 		mReverbPreset.flLateReverbPan[1] = mLateReverbPan.y;
 		mReverbPreset.flLateReverbPan[2] = mLateReverbPan.z;
+		alEffectf(mEffects, AL_EAXREVERB_LATE_REVERB_PAN, (*mReverbPreset.flLateReverbPan));
 	}
 
 	void OAAudioReverb::setEchoTime(float time)
@@ -141,6 +155,7 @@ namespace bs
 		AudioReverb::setEchoTime(time);
 
 		mReverbPreset.flEchoTime = mEchoTime;
+		alEffectf(mEffects, AL_EAXREVERB_ECHO_TIME, mReverbPreset.flEchoTime);
 	}
 
 	void OAAudioReverb::setEchoDepth(float depth)
@@ -148,6 +163,7 @@ namespace bs
 		AudioReverb::setEchoDepth(depth);
 
 		mReverbPreset.flEchoDepth = mEchoDepth;
+		alEffectf(mEffects, AL_EAXREVERB_ECHO_DEPTH, mReverbPreset.flEchoDepth);
 	}
 
 	void OAAudioReverb::setModulationTime(float time)
@@ -155,6 +171,7 @@ namespace bs
 		AudioReverb::setModulationTime(time);
 
 		mReverbPreset.flModulationTime = mModulationTime;
+		alEffectf(mEffects, AL_EAXREVERB_MODULATION_TIME, mReverbPreset.flModulationTime);
 	}
 
 	void OAAudioReverb::setModulationDepth(float depth)
@@ -162,6 +179,7 @@ namespace bs
 		AudioReverb::setModulationDepth(depth);
 
 		mReverbPreset.flModulationDepth = mModulationDepth;
+		alEffectf(mEffects, AL_EAXREVERB_MODULATION_DEPTH, mReverbPreset.flModulationDepth);
 	}
 
 	void OAAudioReverb::setHFReference(float hfref)
@@ -169,6 +187,7 @@ namespace bs
 		AudioReverb::setHFReference(hfref);
 
 		mReverbPreset.flHFReference = mHFReference;
+		alEffectf(mEffects, AL_EAXREVERB_HFREFERENCE, mReverbPreset.flHFReference);
 	}
 
 	void OAAudioReverb::setLFReference(float hfref)
@@ -176,6 +195,7 @@ namespace bs
 		AudioReverb::setLFReference(hfref);
 
 		mReverbPreset.flLFReference = mLFReference;
+		alEffectf(mEffects, AL_EAXREVERB_LFREFERENCE, mReverbPreset.flLFReference);
 	}
 
 	void OAAudioReverb::setHighCut(float freq)
@@ -198,6 +218,7 @@ namespace bs
 		AudioReverb::setRoomRolloffFactor(factor);
 
 		mReverbPreset.flRoomRolloffFactor = mRoomRolloffFactor;
+		alEffectf(mEffects, AL_EAXREVERB_ROOM_ROLLOFF_FACTOR, mReverbPreset.flRoomRolloffFactor);
 	}
 
 	void OAAudioReverb::setAirAbsorptionGainHF(float gain)
@@ -205,6 +226,7 @@ namespace bs
 		AudioReverb::setAirAbsorptionGainHF(gain);
 
 		mReverbPreset.flAirAbsorptionGainHF = mAirAbsorptionGainHF;
+		alEffectf(mEffects, AL_EAXREVERB_AIR_ABSORPTION_GAINHF, mReverbPreset.flAirAbsorptionGainHF);
 	}
 
 	void OAAudioReverb::setDecayHFLimit(bool limit)
@@ -212,6 +234,7 @@ namespace bs
 		AudioReverb::setDecayHFLimit(limit);
 
 		mReverbPreset.iDecayHFLimit = mDecayHFLimit;
+		alEffecti(mEffects, AL_EAXREVERB_DECAY_HFLIMIT, mReverbPreset.iDecayHFLimit);
 	}
 
 	void OAAudioReverb::setReverbPreset(AudioReverbPreset preset)
@@ -286,6 +309,30 @@ namespace bs
 		case AudioReverbPreset::Underwater:
 			mReverbPreset = EFX_REVERB_PRESET_UNDERWATER;
 		}
+
+		alEffectf(mEffects, AL_EAXREVERB_DENSITY, mReverbPreset.flDensity);
+		alEffectf(mEffects, AL_EAXREVERB_DIFFUSION, mReverbPreset.flDiffusion);
+		alEffectf(mEffects, AL_EAXREVERB_GAIN, mReverbPreset.flGain);
+		alEffectf(mEffects, AL_EAXREVERB_GAINHF, mReverbPreset.flGainHF);
+		alEffectf(mEffects, AL_EAXREVERB_GAINLF, mReverbPreset.flGainLF);
+		alEffectf(mEffects, AL_EAXREVERB_DECAY_TIME, mReverbPreset.flDecayTime);
+		alEffectf(mEffects, AL_EAXREVERB_DECAY_HFRATIO, mReverbPreset.flDecayHFRatio);
+		alEffectf(mEffects, AL_EAXREVERB_DECAY_LFRATIO, mReverbPreset.flDecayLFRatio);
+		alEffectf(mEffects, AL_EAXREVERB_REFLECTIONS_GAIN, mReverbPreset.flReflectionsGain);
+		alEffectf(mEffects, AL_EAXREVERB_REFLECTIONS_DELAY, mReverbPreset.flReflectionsDelay);
+		alEffectf(mEffects, AL_EAXREVERB_REFLECTIONS_PAN, (*mReverbPreset.flReflectionsPan));
+		alEffectf(mEffects, AL_EAXREVERB_LATE_REVERB_GAIN, mReverbPreset.flLateReverbGain);
+		alEffectf(mEffects, AL_EAXREVERB_LATE_REVERB_DELAY, mReverbPreset.flLateReverbDelay);
+		alEffectf(mEffects, AL_EAXREVERB_LATE_REVERB_PAN, (*mReverbPreset.flLateReverbPan));
+		alEffectf(mEffects, AL_EAXREVERB_ECHO_TIME, mReverbPreset.flEchoTime);
+		alEffectf(mEffects, AL_EAXREVERB_ECHO_DEPTH, mReverbPreset.flEchoDepth);
+		alEffectf(mEffects, AL_EAXREVERB_MODULATION_TIME, mReverbPreset.flModulationTime);
+		alEffectf(mEffects, AL_EAXREVERB_MODULATION_DEPTH, mReverbPreset.flModulationDepth);
+		alEffectf(mEffects, AL_EAXREVERB_HFREFERENCE, mReverbPreset.flHFReference);
+		alEffectf(mEffects, AL_EAXREVERB_LFREFERENCE, mReverbPreset.flLFReference);
+		alEffectf(mEffects, AL_EAXREVERB_ROOM_ROLLOFF_FACTOR, mReverbPreset.flRoomRolloffFactor);
+		alEffectf(mEffects, AL_EAXREVERB_AIR_ABSORPTION_GAINHF, mReverbPreset.flAirAbsorptionGainHF);
+		alEffecti(mEffects, AL_EAXREVERB_DECAY_HFLIMIT, mReverbPreset.iDecayHFLimit);
 	}
 
 	void OAAudioReverb::setPosition(Vector3 position)
@@ -329,11 +376,54 @@ namespace bs
 		BS_AL_GET_PROC_ADDRESS(alAuxiliaryEffectSlotfv, LPALAUXILIARYEFFECTSLOTFV);
 	}
 
-	void OAAudioReverb::clear()
+	void OAAudioReverb::rebuild()
 	{
-		alDeleteAuxiliaryEffectSlots(1, &mSlot);
-		alDeleteEffects(1, &mEffects);
+		auto& contexts = gOAAudio()._getContexts();
+		UINT32 numContexts = (UINT32)contexts.size();
+
+		{
+			Lock lock(mMutex);
+
+			for (UINT32 i = 0; i < numContexts; i++)
+			{
+				if (contexts.size() > 1)
+					alcMakeContextCurrent(contexts[i]);
+
+				UINT32 mEffects = 0;
+				alGenEffects(1, &mEffects);
+				alEffecti(mEffects, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
+
+				UINT32 mSlot = 0;
+				alGenAuxiliaryEffectSlots(1, &mSlot);
+				alAuxiliaryEffectSloti(mSlot, AL_EFFECTSLOT_EFFECT, mEffects);
+			}
+		}
+
+		for (UINT32 i = 0; i < numContexts; i++)
+		{
+			if (contexts.size() > 1)
+				alcMakeContextCurrent(contexts[i]);
+
+			// TODO: set reverb values to default.
+		}
+
+		buildGenObjects();
 	}
 
+	void OAAudioReverb::clear()
+	{
+		auto& contexts = gOAAudio()._getContexts();
+		UINT32 numContexts = (UINT32)contexts.size();
+
+		Lock lock(mMutex);
+		for (UINT32 i = 0; i < numContexts; i++)
+		{
+			if (contexts.size() > 1)
+				alcMakeContextCurrent(contexts[i]);
+
+			alDeleteAuxiliaryEffectSlots(1, &mSlot);
+			alDeleteEffects(1, &mEffects);
+		}
+	}
 
 }
