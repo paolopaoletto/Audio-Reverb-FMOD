@@ -6,7 +6,7 @@
 namespace bs 
 {
 	template <class Type>
-	class Vector final
+	class BsVector final
 	{
 	public:
 		typedef Type ValueType;
@@ -15,24 +15,24 @@ namespace bs
 		typedef std::reverse_iterator<Type*> ReverseIterator;
 		typedef std::reverse_iterator<const Type*> ConstReverseIterator;
 
-		typedef typename Vector<ValueType>::Iterator IteratorType;
-		typedef typename Vector<ValueType>::Iterator ConstIteratorType;
+		typedef typename BsVector<ValueType>::Iterator IteratorType;
+		typedef typename BsVector<ValueType>::Iterator ConstIteratorType;
 
-		Vector();
-		Vector(size_t n, const Type& value);
-		Vector(Iterator first, Iterator last);
-		Vector(const Vector<Type>& other);
-		~Vector();
+		BsVector();
+		BsVector(size_t n, const Type& value);
+		BsVector(Iterator first, Iterator last);
+		BsVector(const BsVector<Type>& other);
+		~BsVector();
 
-		Vector<ValueType>& operator= (const Vector<ValueType>& other);
-		Vector<ValueType>& operator= (Vector<ValueType>&& other);
+		BsVector<ValueType>& operator= (const BsVector<ValueType>& other);
+		BsVector<ValueType>& operator= (BsVector<ValueType>&& other);
 
-		bool operator== (const Vector<ValueType>& other) const;
-		bool operator!= (const Vector<ValueType>& other) const;
-		bool operator< (const Vector<ValueType>& other) const;
-		bool operator<= (const Vector<ValueType>& other) const;
-		bool operator> (const Vector<ValueType>& other) const;
-		bool operator>= (const Vector<ValueType>& other) const;
+		bool operator== (const BsVector<ValueType>& other) const;
+		bool operator!= (const BsVector<ValueType>& other) const;
+		bool operator< (const BsVector<ValueType>& other) const;
+		bool operator<= (const BsVector<ValueType>& other) const;
+		bool operator> (const BsVector<ValueType>& other) const;
+		bool operator>= (const BsVector<ValueType>& other) const;
 
 		Type& operator[] (size_t index);
 		const Type& operator[] (size_t index) const;
@@ -80,7 +80,7 @@ namespace bs
 		void push_back(const Type& element);
 		void push_back(ValueType&& element);
 		void pop_back();
-		void swap(Vector<Type>& other);
+		void swap(BsVector<Type>& other);
 		void clear();
 		void reallocate();
 
@@ -91,21 +91,22 @@ namespace bs
 		Type* mArr;
 		size_t mInitSize = 2;
 		size_t mArrSize = 0;
-		StaticAlloc alloc;
 		const size_t BS_VECTOR_SIZE = 2 << 16;
 	};
 
 	template <class Type>
-	Vector<Type>::Vector()
+	BsVector<Type>::BsVector()
 	{
-		mArr = new Type[mInitSize];
+		//mArr = new Type[mInitSize];
+		mArr = bs_allocN<Type>(mInitSize); // Add New
 	}
 
 	template <class Type>
-	Vector<Type>::Vector(size_t n, const Type& value)
+	BsVector<Type>::BsVector(size_t n, const Type& value)
 	{
 		mInitSize = n << 2;
-		mArr = new Type[mInitSize];
+		//mArr = new Type[mInitSize];
+		mArr = bs_allocN<Type>(mInitSize); // Add New
 
 		for (size_t i = 0; i < n; ++i)
 		{
@@ -116,11 +117,12 @@ namespace bs
 	}
 
 	template <class Type>
-	Vector<Type>::Vector(Iterator first, Iterator last)
+	BsVector<Type>::BsVector(Iterator first, Iterator last)
 	{
 		size_t count = last - first;
 		mInitSize = count << 2;
-		mArr = new Type[mInitSize];
+		//mArr = new Type[mInitSize];
+		mArr = bs_allocN<Type>(mInitSize); // Add New
 
 		for (size_t i = 0; i < count; ++i, ++first)
 		{
@@ -131,10 +133,11 @@ namespace bs
 	}
 
 	template <class Type>
-	Vector<Type>::Vector(const Vector<Type>& other)
+	BsVector<Type>::BsVector(const BsVector<Type>& other)
 	{
 		mInitSize = other.mInitSize;
-		mArr = new Type[mInitSize];
+		//mArr = new Type[mInitSize];
+		mArr = bs_allocN<Type>(mInitSize); // Add New
 
 		for (size_t i = 0; i < other.mArrSize; ++i)
 		{
@@ -145,13 +148,14 @@ namespace bs
 	}
 
 	template <class Type>
-	Vector<Type>::~Vector()
+	BsVector<Type>::~BsVector()
 	{
-		delete[] mArr;
+		//delete[] mArr;
+		bs_delete(mArr);
 	}
 
 	template <class Type>
-	Vector<Type>& Vector<Type>::operator= (const Vector<Type>& other)
+	BsVector<Type>& BsVector<Type>::operator= (const BsVector<Type>& other)
 	{
 		if (mInitSize < other.mArrSize)
 		{
@@ -168,7 +172,7 @@ namespace bs
 	}
 
 	template <class Type>
-	Vector<Type>& Vector<Type>::operator= (Vector<Type>&& other)
+	BsVector<Type>& BsVector<Type>::operator= (BsVector<Type>&& other)
 	{
 		if (mInitSize < other.mArrSize)
 		{
@@ -185,7 +189,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	bool Vector<Type>::operator== (const Vector<Type>& other) const
+	bool BsVector<Type>::operator== (const BsVector<Type>& other) const
 	{
 		if (mArrSize != other.mArrSize)
 			return false;
@@ -200,7 +204,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	bool Vector<Type>::operator!= (const Vector<Type>& other) const
+	bool BsVector<Type>::operator!= (const BsVector<Type>& other) const
 	{
 		if (mArrSize != other.mArrSize)
 			return true;
@@ -215,7 +219,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	bool Vector<Type>::operator< (const Vector<Type>& other) const
+	bool BsVector<Type>::operator< (const BsVector<Type>& other) const
 	{
 		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
@@ -229,7 +233,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	bool Vector<Type>::operator<= (const Vector<Type>& other) const
+	bool BsVector<Type>::operator<= (const BsVector<Type>& other) const
 	{
 		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
@@ -243,7 +247,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	bool Vector<Type>::operator> (const Vector<Type>& other) const
+	bool BsVector<Type>::operator> (const BsVector<Type>& other) const
 	{
 		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
@@ -257,7 +261,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	bool Vector<Type>::operator>= (const Vector<Type>& other) const
+	bool BsVector<Type>::operator>= (const BsVector<Type>& other) const
 	{
 		size_t length = mArrSize < other.mArrSize ? mArrSize : other.mArrSize;
 
@@ -271,7 +275,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Vector<Type>::assign(size_t count, const Type& value)
+	void BsVector<Type>::assign(size_t count, const Type& value)
 	{
 		if (count > mInitSize)
 		{
@@ -288,7 +292,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Vector<Type>::assign(IteratorType first, IteratorType last)
+	void BsVector<Type>::assign(IteratorType first, IteratorType last)
 	{
 		size_t count = last - first;
 		if (count > mInitSize)
@@ -306,91 +310,93 @@ namespace bs
 	}
 
 	template <class Type>
-	typename Vector<Type>::Iterator Vector<Type>::begin()
+	typename BsVector<Type>::Iterator BsVector<Type>::begin()
 	{
 		return mArr;
 	}
 
 	template <class Type>
-	typename Vector<Type>::Iterator Vector<Type>::end()
+	typename BsVector<Type>::Iterator BsVector<Type>::end()
 	{
 		return mArr + mArrSize;
 	}
 
 	template <class Type>
-	typename Vector<Type>::ConstIterator Vector<Type>::cbegin() const
+	typename BsVector<Type>::ConstIterator BsVector<Type>::cbegin() const
 	{
 		return mArr;
 	}
 
 
 	template <class Type>
-	typename Vector<Type>::ConstIterator Vector<Type>::cend() const
+	typename BsVector<Type>::ConstIterator BsVector<Type>::cend() const
 	{
 		return mArr + mArrSize;
 	}
 
 	template <class Type>
-	typename Vector<Type>::ReverseIterator Vector<Type>::rbegin()
+	typename BsVector<Type>::ReverseIterator BsVector<Type>::rbegin()
 	{
 		return ReverseIterator(mArr + mArrSize);
 	}
 
 	template <class Type>
-	typename Vector<Type>::ReverseIterator Vector<Type>::rend()
+	typename BsVector<Type>::ReverseIterator BsVector<Type>::rend()
 	{
 		return ReverseIterator(mArr);
 	}
 
 	template <class Type>
-	typename Vector<Type>::ConstReverseIterator Vector<Type>::crbegin() const
+	typename BsVector<Type>::ConstReverseIterator BsVector<Type>::crbegin() const
 	{
 		return ReverseIterator(mArr + mArrSize);
 	}
 
 	template <class Type>
-	typename Vector<Type>::ConstReverseIterator Vector<Type>::crend() const
+	typename BsVector<Type>::ConstReverseIterator BsVector<Type>::crend() const
 	{
 		return ReverseIterator(mArr);
 	}
 
 	template <class Type>
-	void Vector<Type>::reallocate()
+	void BsVector<Type>::reallocate()
 	{
-		Type* tmp = new Type[mInitSize];
+		//Type* tmp = new Type[mInitSize];
+		Type* tmp = bs_allocN<Type>(mInitSize); // Add New
 
 		memcpy(tmp, mArr, mArrSize * sizeof(Type));
 
-		delete[] mArr;
+		//delete[] mArr;
+		bs_delete(mArr);
 		mArr = tmp;
 	}
 
 	template <class Type>
-	bool Vector<Type>::empty() const
+	bool BsVector<Type>::empty() const
 	{
 		return mArrSize == 0;
 	}
 
 	template <class Type>
-	size_t Vector<Type>::size() const
+	size_t BsVector<Type>::size() const
 	{
 		return mArrSize;
 	}
 
 	template <typename Type>
-	size_t Vector<Type>::max_size() const
+	size_t BsVector<Type>::max_size() const
 	{
 		return BS_VECTOR_SIZE;
 	}
 
 	template <class Type>
-	size_t Vector<Type>::capacity() const
+	size_t BsVector<Type>::capacity() const
 	{
 		return mInitSize;
 	}
 
 	template <class Type>
-	void Vector<Type>::resize(size_t sz)
+	void BsVector<Type>::resize(size_t sz)
 	{
 		if (sz > mArrSize)
 		{
@@ -410,7 +416,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Vector<Type>::resize(size_t _size, const Type& _ref)
+	void BsVector<Type>::resize(size_t _size, const Type& _ref)
 	{
 		if (_size > mArrSize)
 		{
@@ -435,7 +441,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Vector<Type>::reserve(size_t _size)
+	void BsVector<Type>::reserve(size_t _size)
 	{
 		if (_size > mInitSize)
 		{
@@ -445,26 +451,26 @@ namespace bs
 	}
 
 	template <class Type>
-	void Vector<Type>::shrink_to_fit()
+	void BsVector<Type>::shrink_to_fit()
 	{
 		mInitSize = mArrSize;
 		reallocate();
 	}
 
 	template <typename Type>
-	Type& Vector<Type>::operator[] (size_t index)
+	Type& BsVector<Type>::operator[] (size_t index)
 	{
 		return mArr[index];
 	}
 
 	template <typename Type>
-	const Type& Vector<Type>::operator[] (size_t index) const
+	const Type& BsVector<Type>::operator[] (size_t index) const
 	{
 		return mArr[index];
 	}
 
 	template <typename Type>
-	Type& Vector<Type>::at(size_t index)
+	Type& BsVector<Type>::at(size_t index)
 	{
 		if (index < mArrSize)
 		{
@@ -472,12 +478,13 @@ namespace bs
 		}
 		else
 		{
-			throw std::out_of_range("index is out of range\n");
+			//throw std::out_of_range("index is out of range\n");
+			LOGERR("Index is out of range\n"); // Add New
 		}
 	}
 
 	template <typename Type>
-	const Type& Vector<Type>::at(size_t index) const
+	const Type& BsVector<Type>::at(size_t index) const
 	{
 		if (index < mArrSize)
 		{
@@ -485,50 +492,51 @@ namespace bs
 		}
 		else
 		{
-			throw std::out_of_range("index is out of range\n");
+			//throw std::out_of_range("index is out of range\n");
+			LOGERR("Index is out of range\n"); // Add New
 		}
 	}
 
 	template <typename Type>
-	Type& Vector<Type>::front()
+	Type& BsVector<Type>::front()
 	{
 		return mArr[0];
 	}
 
 	template <typename Type>
-	const Type& Vector<Type>::front() const
+	const Type& BsVector<Type>::front() const
 	{
 		return mArr[0];
 	}
 
 	template <typename Type>
-	Type& Vector<Type>::back()
+	Type& BsVector<Type>::back()
 	{
 		return mArr[mArrSize - 1];
 	}
 
 	template <typename Type>
-	const Type& Vector<Type>::back() const
+	const Type& BsVector<Type>::back() const
 	{
 		return mArr[mArrSize - 1];
 	}
 
 
 	template <typename Type>
-	Type* Vector<Type>::data()
+	Type* BsVector<Type>::data()
 	{
 		return mArr;
 	}
 
 	template <typename Type>
-	const Type* Vector<Type>::data() const
+	const Type* BsVector<Type>::data() const
 	{
 		return mArr;
 	}
 
 	template <typename Type>
 	template <class ...Args>
-	void Vector<Type>::emplace_back(Args&& ...args)
+	void BsVector<Type>::emplace_back(Args&& ...args)
 	{
 		if (mArrSize == mInitSize)
 		{
@@ -541,7 +549,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	void Vector<Type>::push_back(const Type& element)
+	void BsVector<Type>::push_back(const Type& element)
 	{
 		if (mArrSize == mInitSize)
 		{
@@ -554,7 +562,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	void Vector<Type>::push_back(ValueType&& element)
+	void BsVector<Type>::push_back(ValueType&& element)
 	{
 		if (mArrSize == mInitSize)
 		{
@@ -567,14 +575,14 @@ namespace bs
 	}
 
 	template <typename Type>
-	void Vector<Type>::pop_back()
+	void BsVector<Type>::pop_back()
 	{
 		--mArrSize;
 		mArr[mArrSize].~Type();
 	}
 
 	template <typename Type>
-	typename Vector<Type>::Iterator Vector<Type>::insert(ConstIterator it, ValueType&& element)
+	typename BsVector<Type>::Iterator BsVector<Type>::insert(ConstIterator it, ValueType&& element)
 	{
 		Iterator iter = &mArr[it - mArr];
 		if (mArrSize == mInitSize)
@@ -592,7 +600,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	typename Vector<Type>::Iterator Vector<Type>::erase(typename Vector<Type>::ConstIterator first, typename Vector<Type>::ConstIterator last)
+	typename BsVector<Type>::Iterator BsVector<Type>::erase(typename BsVector<Type>::ConstIterator first, typename BsVector<Type>::ConstIterator last)
 	{
 		Iterator iter = &mArr[first - mArr];
 		if (first == last)
@@ -610,7 +618,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	void Vector<Type>::swap(Vector<Type>& other)
+	void BsVector<Type>::swap(BsVector<Type>& other)
 	{
 		const size_t tmpSize = mArrSize;
 		const size_t tmpInitSize = mInitSize;
@@ -626,7 +634,7 @@ namespace bs
 	}
 
 	template <typename Type>
-	void Vector<Type>::clear()
+	void BsVector<Type>::clear()
 	{
 		for (size_t i = 0; i < mArrSize; ++i)
 		{

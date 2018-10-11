@@ -5,8 +5,8 @@
 
 namespace bs
 {
-	template <class Type>
-	class SmallVectorBuffer
+	template <class Type, class StaticAllocator = StaticAlloc<>>
+	class BsSmallVectorBuffer
 	{
 	public:
 		/** Types */
@@ -16,85 +16,18 @@ namespace bs
 		typedef std::reverse_iterator<Type*> ReverseIterator;
 		typedef std::reverse_iterator<const Type*> ConstReverseIterator;
 
-	protected:
-		/** Determines when the small vector has not had dynamic allocation. */
-		bool isSmall() const
-		{
-			return static_cast<const void*>(mFirst) == static_cast<const void*>(&firstElement);
-		}
-
-		void deallocateOldElements()
-		{
-			if (!isSmall())
-			{
-				operator delete(mFirst);
-			}
-		}
-
-		/** Construct the elements range. */
-		void constructElements(Type* f, Type* l, const Type& element)
-		{
-			for (; f != l; ++f)
-			{
-				new (f) ValueType(element);
-			}
-		}
-
-		/** Destroy the elements range. */
-		void destroyElements(Type* f, Type* l)
-		{
-			while (f != l)
-			{
-				--l;
-				l->~ValueType();
-			}
-		}
-
-	protected:
-		void grow(size_t min = 0)
-		{
-			const size_t current = mCapacity - mFirst;
-			const size_t size = size();
-			size_t newCapacity = current * 2;
-
-			if (newCapacity < min)
-			{
-				newCapacity = min;
-			}
-
-			Type* newElements = static_cast<Type*>(operator new(newCapacity * sizeof(ValueType)));
-
-			if (std::is_class<ValueType>::value)
-			{
-				std::uninitialized_copy(mFirst, mLast, newElements);
-			}
-			else
-			{
-				memcpy(newElements, mFirst, size * sizeof(ValueType));
-			}
-
-			destroyElements(mFirst, mLast);
-
-			deallocateOldElements();
-
-			mFirst = newElements;
-			mLast = newElements + size;
-			mCapacity = mFirst + newCapacity;
-		}
-
-	public:
-		SmallVectorBuffer(UINT32 N)
+		BsSmallVectorBuffer(UINT32 N)
 			: mFirst(reinterpret_cast<Type*>(&firstElement)), mLast(reinterpret_cast<Type*>(&firstElement)),
 			mCapacity(reinterpret_cast<Type*>(&firstElement) + N) { }
 
-		~SmallVectorBuffer()
+		~BsSmallVectorBuffer()
 		{
 			destroyElements(mFirst, mLast);
 
 			deallocateOldElements();
 		};
 
-		bool operator== (const SmallVectorBuffer& other)
+		bool operator== (const BsSmallVectorBuffer& other)
 		{
 			if (size() != other.size())
 				return false;
@@ -109,7 +42,7 @@ namespace bs
 			return true;
 		}
 
-		bool operator!= (const SmallVectorBuffer& other) { return !(*this == other); }
+		bool operator!= (const BsSmallVectorBuffer& other) { return !(*this == other); }
 
 		Type& operator[] (size_t index) { return mFirst[index]; }
 		const Type& operator[] (size_t index) const { return mFirst[index]; }
@@ -200,10 +133,78 @@ namespace bs
 			}
 		}
 
+		protected:
+			/** Determines when the small vector has not had dynamic allocation. */
+			bool isSmall() const
+			{
+				return static_cast<const void*>(mFirst) == static_cast<const void*>(&firstElement);
+			}
+
+			void deallocateOldElements()
+			{
+				if (!isSmall())
+				{
+					//operator delete(mFirst);
+					mStaticAlloc.destruct<Type>(mFirst); // Add New
+				}
+			}
+
+			/** Construct the elements range. */
+			void constructElements(Type* f, Type* l, const Type& element)
+			{
+				for (; f != l; ++f)
+				{
+					new (f) ValueType(element);
+				}
+			}
+
+			/** Destroy the elements range. */
+			void destroyElements(Type* f, Type* l)
+			{
+				while (f != l)
+				{
+					--l;
+					l->~ValueType();
+				}
+			}
+
+		void grow(size_t min = 0)
+		{
+			const size_t current = mCapacity - mFirst;
+			const size_t size = size();
+			size_t newCapacity = current * 2;
+
+			if (newCapacity < min)
+			{
+				newCapacity = min;
+			}
+
+			//Type* newElements = static_cast<Type*>(operator new(newCapacity * sizeof(ValueType)));
+			Type* newElements = static_cast<Type*>(mStaticAlloc.construct<Type>(newCapacity * sizeof(ValueType))); // Add Newf
+
+			if (std::is_class<ValueType>::value)
+			{
+				std::uninitialized_copy(mFirst, mLast, newElements);
+			}
+			else
+			{
+				memcpy(newElements, mFirst, size * sizeof(ValueType));
+			}
+
+			destroyElements(mFirst, mLast);
+
+			deallocateOldElements();
+
+			mFirst = newElements;
+			mLast = newElements + size;
+			mCapacity = mFirst + newCapacity;
+		}
+
 	protected:
 		ValueType* mFirst;
 		ValueType* mLast;
 		ValueType* mCapacity;
+		StaticAlloc<> mStaticAlloc;
 
 		/**
 		* Choose which system to use for the space representation.
@@ -223,12 +224,12 @@ namespace bs
 	};
 
 	template <UINT32 N, class Type>
-	class SmallVector final : public SmallVectorBuffer<Type>
+	class BsSmallVector final : public BsSmallVectorBuffer<Type>
 	{
 	public:
 		typedef Type ValueType;
 	private:
-		typedef typename SmallVectorBuffer<Type>::U Unit;
+		typedef typename BsSmallVectorBuffer<Type>::U Unit;
 
 		/** The number of the union U require for N template type. */
 		static constexpr auto MINUNIT = (static_cast<UINT32>(sizeof(ValueType))*N +
@@ -246,9 +247,9 @@ namespace bs
 		Unit element[ELEMENTS];
 
 	public:
-		SmallVector() : SmallVectorBuffer<ValueType>(ALLOC) { };
-		SmallVector(size_t size, const Type& value = ValueType())
-			: SmallVectorBuffer<ValueType>(ALLOC)
+		BsSmallVector() : BsSmallVectorBuffer<ValueType>(ALLOC) { };
+		BsSmallVector(size_t size, const Type& value = ValueType())
+			: BsSmallVectorBuffer<ValueType>(ALLOC)
 		{
 			this->reserve(size);
 			while (size--)
@@ -257,6 +258,6 @@ namespace bs
 			}
 		}
 
-		~SmallVector() = default;
+		~BsSmallVector() = default;
 	};
 }

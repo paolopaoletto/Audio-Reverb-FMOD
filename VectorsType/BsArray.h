@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Prerequisites/BsPrerequisitesUtil.h"
+#include "Allocators/BsMemoryAllocator.h"
 
 namespace bs 
 {
@@ -21,20 +22,20 @@ namespace bs
 		Type& operator[] (UINT32 index);
 		const Type& operator[] (UINT32 index) const;
 
-		Type* address();
-		const Type* address() const;
+		Type* data();
+		const Type* data() const;
 
 		void alloc(UINT32 elements, bool data);
-		void smallAlloc(UINT32 elements, bool data);
+		void allocNoConstruct(UINT32 elements, bool data);
 
-		UINT32 getCapacity() const;
+		UINT32 capacity() const;
 
 		void add(const Type& element);
 		ValueType pop();
 
-		bool setLength(UINT32 element);
-		bool setSmallLength(UINT32 element);
-		UINT32 getLength() const;
+		bool reserve(UINT32 element);
+		bool reserveNoConstruct(UINT32 element);
+		UINT32 size() const;
 
 		bool exists(const Type& element) const;
 		int indexElement(const Type& element) const;
@@ -67,7 +68,8 @@ namespace bs
 	template <class Type>
 	Array<Type>::~Array()
 	{
-		delete[] mArr;
+		//delete[] mArr;
+		bs_delete(mArr);
 	}
 
 	template <class Type>
@@ -109,13 +111,13 @@ namespace bs
 	}
 
 	template <class Type>
-	Type* Array<Type>::address()
+	Type* Array<Type>::data()
 	{
 		return mArr;
 	}
 
 	template <class Type>
-	const Type* Array<Type>::address() const
+	const Type* Array<Type>::data() const
 	{
 		return mArr;
 	}
@@ -162,7 +164,8 @@ namespace bs
 			}
 			else
 			{
-				tmp = new Type[sizeof(Type) * elements];
+				//tmp = new Type[sizeof(Type) * elements];
+				tmp = bs_allocN<Type>(elements); // Add New
 
 				if (tmp == 0)
 				{
@@ -181,7 +184,7 @@ namespace bs
 			else
 			{
 
-				for (UINT32 n = 0; n < elements; n++)
+				for (UINT32 i = 0; i < elements; i++)
 				{
 					new (&tmp[i]) Type();
 				}
@@ -237,7 +240,8 @@ namespace bs
 
 				if (mArr != reinterpret_cast<Type*>(mBuffer))
 				{
-					delete[] mArr;
+					//delete[] mArr;
+					bs_delete(mArr); // Add New
 				}
 			}
 		}
@@ -247,7 +251,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::smallAlloc(UINT32 elements, bool data)
+	void Array<Type>::allocNoConstruct(UINT32 numElements, bool keepData)
 	{
 		Type* tmp = 0;
 
@@ -259,7 +263,8 @@ namespace bs
 			}
 			else
 			{
-				tmp = new Type[sizeof(Type) * elements];
+				//tmp = new Type[sizeof(Type) * elements];
+				tmp = bs_allocN<Type>(elements); // Add New
 
 				if (tmp == 0)
 				{
@@ -302,7 +307,8 @@ namespace bs
 
 				if (mArr != reinterpret_cast<Type*>(mBuffer))
 				{
-					delete[] mArr;
+					//delete[] mArr;
+					bs_delete(mArr); // Add New
 				}
 			}
 		}
@@ -312,13 +318,13 @@ namespace bs
 	}
 
 	template <class Type>
-	UINT32 Array<Type>::getCapacity() const
+	UINT32 Array<Type>::capacity() const
 	{
 		return mMaxLength;
 	}
 
 	template <class Type>
-	bool Array<Type>::setLength(UINT32 elements)
+	bool Array<Type>::reserve(UINT32 element)
 	{
 		if (elements > mMaxLength)
 		{
@@ -336,11 +342,11 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::setSmallLength(UINT32 elements)
+	bool Array<Type>::reserveNoConstruct(UINT32 elements)
 	{
 		if (elements > mMaxLength)
 		{
-			smallAlloc(elements, true);
+			allocNoConstruct(elements, true);
 
 			if (elements > mMaxLength)
 			{
@@ -354,7 +360,7 @@ namespace bs
 	}
 
 	template <class Type>
-	UINT32 Array<Type>::getLength() const
+	UINT32 Array<Type>::size() const
 	{
 		return mLength;
 	}
