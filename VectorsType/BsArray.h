@@ -151,7 +151,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::alloc(UINT32 elements, bool data)
+	void Array<Type>::alloc(UINT32 numElements, bool data)
 	{
 		Type* tmp = 0;
 
@@ -323,7 +323,7 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::reserve(UINT32 elements)
+	bool Array<Type>::reserve(UINT32 element)
 	{
 		if (elements > mMaxLength)
 		{
@@ -335,7 +335,7 @@ namespace bs
 			}
 		}
 
-		mLength = elements;
+		mLength = element;
 
 		return true;
 	}
