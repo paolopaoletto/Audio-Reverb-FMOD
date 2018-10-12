@@ -251,7 +251,7 @@ namespace bs
 	}
 
 	template <class Type>
-	void Array<Type>::allocNoConstruct(UINT32 numElements, bool keepData)
+	void Array<Type>::allocNoConstruct(UINT32 elements, bool keepData)
 	{
 		Type* tmp = 0;
 
@@ -324,7 +324,7 @@ namespace bs
 	}
 
 	template <class Type>
-	bool Array<Type>::reserve(UINT32 element)
+	bool Array<Type>::reserve(UINT32 elements)
 	{
 		if (elements > mMaxLength)
 		{
@@ -336,7 +336,7 @@ namespace bs
 			}
 		}
 
-		mLength = element;
+		mLength = elements;
 
 		return true;
 	}
