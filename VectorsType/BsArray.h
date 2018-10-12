@@ -84,7 +84,6 @@ namespace bs
 		return mArr[index];
 	}
 
-
 	template <class Type>
 	bool Array<Type>::operator== (const Array<Type>& other) const
 	{
