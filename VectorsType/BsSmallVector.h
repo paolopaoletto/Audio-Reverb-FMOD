@@ -218,7 +218,7 @@ namespace bs
 			mArr[mSize++] = std::move(element);
 		}
 
-		void pop()
+		Type pop()
 		{
 			return mArr[--mSize];
 		}
