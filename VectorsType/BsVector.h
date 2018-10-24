@@ -19,13 +19,17 @@ namespace bs
 		typedef typename BsVector<ValueType>::Iterator ConstIteratorType;
 
 		BsVector();
+		explicit BsVector(size_t n);
 		BsVector(size_t n, const Type& value);
 		BsVector(Iterator first, Iterator last);
 		BsVector(const BsVector<Type>& other);
+		BsVector(BsVector<Type>&& other);
+		BsVector(std::initializer_list<Type> other);
 		~BsVector();
 
 		BsVector<ValueType>& operator= (const BsVector<ValueType>& other);
 		BsVector<ValueType>& operator= (BsVector<ValueType>&& other);
+		BsVector<ValueType>& operator= (std::initializer_list<ValueType> other);
 
 		bool operator== (const BsVector<ValueType>& other) const;
 		bool operator!= (const BsVector<ValueType>& other) const;
@@ -39,6 +43,7 @@ namespace bs
 
 		void assign(size_t n, const Type& value);
 		void assign(IteratorType first, IteratorType last);
+		void assign(std::initializer_list<ValueType> other);
 
 		bool empty() const;
 
@@ -77,6 +82,9 @@ namespace bs
 		template <typename ...Args>
 		void emplace_back(Args&& ...args);
 
+		template <typename ...Args> 
+		Iterator emplace(ConstIterator it, Args&& ...args);
+
 		void push_back(const Type& element);
 		void push_back(ValueType&& element);
 		void pop_back();
@@ -84,7 +92,15 @@ namespace bs
 		void clear();
 		void reallocate();
 
+		Iterator insert(ConstIterator it, const ValueType& element);
 		Iterator insert(ConstIterator it, ValueType&& element);
+		Iterator insert(ConstIterator it, size_t n, const ValueType& element);
+		Iterator insert(ConstIterator it, std::initializer_list<ValueType> other);
+
+		template <typename InputIt>
+		Iterator insert(ConstIterator it, InputIt first, InputIt last);
+
+		Iterator erase(ConstIterator it);
 		Iterator erase(ConstIterator first, ConstIterator last);
 
 	private:
@@ -97,16 +113,28 @@ namespace bs
 	template <class Type>
 	BsVector<Type>::BsVector()
 	{
-		//mArr = new Type[mInitSize];
-		mArr = bs_allocN<Type>(mInitSize); // Add New
+		mArr = bs_allocN<Type>(mInitSize);
+	}
+
+	template <class Type>
+	BsVector<Type>::BsVector(size_t n) 
+	{
+		mInitSize = n << 2;
+		mArr = bs_allocN<Type>(mInitSize);
+
+		for (size_t i = 0; i < n; ++i) 
+		{
+			mArr[i] = Type();
+		}
+
+		mArrSize = n;
 	}
 
 	template <class Type>
 	BsVector<Type>::BsVector(size_t n, const Type& value)
 	{
 		mInitSize = n << 2;
-		//mArr = new Type[mInitSize];
-		mArr = bs_allocN<Type>(mInitSize); // Add New
+		mArr = bs_allocN<Type>(mInitSize);
 
 		for (size_t i = 0; i < n; ++i)
 		{
@@ -121,8 +149,7 @@ namespace bs
 	{
 		size_t count = last - first;
 		mInitSize = count << 2;
-		//mArr = new Type[mInitSize];
-		mArr = bs_allocN<Type>(mInitSize); // Add New
+		mArr = bs_allocN<Type>(mInitSize);
 
 		for (size_t i = 0; i < count; ++i, ++first)
 		{
@@ -136,8 +163,7 @@ namespace bs
 	BsVector<Type>::BsVector(const BsVector<Type>& other)
 	{
 		mInitSize = other.mInitSize;
-		//mArr = new Type[mInitSize];
-		mArr = bs_allocN<Type>(mInitSize); // Add New
+		mArr = bs_allocN<Type>(mInitSize);
 
 		for (size_t i = 0; i < other.mArrSize; ++i)
 		{
@@ -148,10 +174,38 @@ namespace bs
 	}
 
 	template <class Type>
+	BsVector<Type>::BsVector(BsVector<Type>&& other)
+	{
+		mInitSize = other.mInitSize;
+		mArr = bs_allocN<Type>(mInitSize);
+
+		for (size_t i = 0; i < other.mArrSize; ++i) 
+		{
+			mArr[i] = std::move(other.mArr[i]);
+		}
+
+		mArrSize = other.mArrSize;
+	}
+
+	template <class Type>
+	BsVector<Type>::BsVector(std::initializer_list<Type> other) 
+	{
+		mInitSize = other.size() << 2;
+		mArr = bs_allocN<Type>(mInitSize);
+
+		for (auto& i : other) 
+			mArr[mArrSize++] = i;
+	}
+
+	template <class Type>
 	BsVector<Type>::~BsVector()
 	{
-		//delete[] mArr;
-		bs_delete(mArr);
+		bs_free(mArr);
+
+		for (int i = 0; i < mArrSize; ++i)
+		{
+			mArr[i].~Type();
+		}
 	}
 
 	template <class Type>
@@ -186,6 +240,21 @@ namespace bs
 		}
 
 		mArrSize = other.mArrSize;
+	}
+
+	template <class Type>
+	BsVector<Type>& BsVector<Type>::operator= (std::initializer_list<Type> other) 
+	{
+		if (mInitSize < other.size()) 
+		{
+			mInitSize = other.size() << 2;
+			reallocate();
+		}
+
+		mArrSize = 0;
+
+		for (auto& i : lst)
+			arr[mArrSize++] = i;
 	}
 
 	template <typename Type>
@@ -310,6 +379,22 @@ namespace bs
 	}
 
 	template <class Type>
+	void BsVector<Type>::assign(std::initializer_list<Type> other) 
+	{
+		size_t count = other.size();
+
+		if (count > mInitSize) 
+		{
+			mInitSize = count << 2;
+			reallocate();
+		}
+
+		size_t i = 0;
+		for (auto& j : other)
+			mArr[i++] = j;
+	}
+
+	template <class Type>
 	typename BsVector<Type>::Iterator BsVector<Type>::begin()
 	{
 		return mArr;
@@ -361,13 +446,11 @@ namespace bs
 	template <class Type>
 	void BsVector<Type>::reallocate()
 	{
-		//Type* tmp = new Type[mInitSize];
-		Type* tmp = bs_allocN<Type>(mInitSize); // Add New
+		Type* tmp = bs_allocN<Type>(mInitSize);
 
 		memcpy(tmp, mArr, mArrSize * sizeof(Type));
 
-		//delete[] mArr;
-		bs_delete(mArr);
+		bs_free(mArr);
 		mArr = tmp;
 	}
 
@@ -478,8 +561,7 @@ namespace bs
 		}
 		else
 		{
-			//throw std::out_of_range("index is out of range\n");
-			LOGERR("Index is out of range\n"); // Add New
+			LOGERR("Index is out of range\n");
 		}
 	}
 
@@ -492,8 +574,7 @@ namespace bs
 		}
 		else
 		{
-			//throw std::out_of_range("index is out of range\n");
-			LOGERR("Index is out of range\n"); // Add New
+			LOGERR("Index is out of range\n");
 		}
 	}
 
@@ -547,6 +628,25 @@ namespace bs
 		mArr[mArrSize] = std::move(Type(std::forward<Args>(args) ...));
 		++mArrSize;
 	}
+	
+	template <typename Type>
+	template <class ...Args>
+	typename BsVector<Type>::Iterator BsVector<Type>::emplace(typename BsVector<Type>::ConstIterator it, Args&&... args) 
+	{
+		Iterator iter = &mArr[it - arr];
+		if (mArrSize == mInitSize) 
+		{
+			mInitSize <<= 2;
+			reallocate();
+		}
+
+		memmove(iter + 1, iter, (mArrSize - (it - arr)) * sizeof(Type));
+
+		(*iter) = std::move(Type(std::forward<Args>(args) ...));
+		++mArrSize;
+
+		return iter;
+	}
 
 	template <typename Type>
 	void BsVector<Type>::push_back(const Type& element)
@@ -557,7 +657,8 @@ namespace bs
 			reallocate();
 		}
 
-		mArr[mArrSize] = element;
+		new (mArr + mArrSize) Type(element);
+
 		++mArrSize;
 	}
 
@@ -570,7 +671,8 @@ namespace bs
 			reallocate();
 		}
 
-		mArr[mArrSize] = std::move(element);
+		new (mArr + mArrSize) Type(std::move(element));
+
 		++mArrSize;
 	}
 
@@ -579,6 +681,24 @@ namespace bs
 	{
 		--mArrSize;
 		mArr[mArrSize].~Type();
+	}
+
+	template <class Type>
+	typename BsVector<Type>::Iterator BsVector<Type>::insert(ConstIterator it, const ValueType& element) 
+	{
+		Iterator iter = &mArr[it - mArr];
+		if (mArrSize == mInitSize) 
+		{
+			mInitSize <<= 2;
+			reallocate();
+		}
+
+		memmove(iter + 1, iter, (mArrSize - (it - mArr)) * sizeof(Type));
+		
+		(*iter) = element;
+		++mArrSize;
+		
+		return iter;
 	}
 
 	template <typename Type>
@@ -593,9 +713,89 @@ namespace bs
 
 		memmove(iter + 1, iter, (mArrSize - (it - mArr)) * sizeof(Type));
 
-		(*iter) = element;
+		(*iter) = std::move(element);
 		++mArrSize;
 
+		return iter;
+	}
+
+	template <class Type>
+	typename BsVector<Type>::Iterator BsVector<Type>::insert(ConstIterator it, size_t n, const ValueType& element) 
+	{
+		Iterator iter = &mArr[it - mArr];
+
+		if (!n) 
+			return iter;
+
+		if (mArr + n > mInitSize) 
+		{
+			mInitSize = (mArrSize n) << 2;
+			reallocate();
+		}
+		
+		memmove(iter + n, iter, (mArrSize - (it - mArr)) * sizeof(Type));
+		mArrSize += n;
+		
+		for (Iterator it = iter; n--; ++it)
+			(*it) = element;
+		
+		return n;
+	}
+
+	template <typename Type>
+	template <class InputIt>
+	typename BsVector<Type>::Iterator BsVector<Type>::insert(
+		typename BsVector<Type>::ConstIterator it, InputIt first, InputIt last) 
+	{
+		Iterator iter = &mArr[it - mArr];
+		size_t n = last - first;
+
+		if (!n) 
+			return iter;
+
+		if (mArrSize + n > mInitSize) 
+		{
+			mInitSize = (mArrSize + n) << 2;
+			reallocate();
+		}
+
+		memmove(iter + n, iter, (mArrSize - (it - mArr)) * sizeof(Type));
+		
+		for (Iterator it = iter; first != last; ++it, ++first)
+			(*it) = *first;
+
+		mArrSize += n;
+		
+		return iter;
+	}
+
+	template <class Type>
+	typename BsVector<Type>::Iterator BsVector<Type>::insert(
+		typename BsVector<Type>::ConstIterator it, std::initializer_list<Type> other) 
+	{
+		size_t n = other.size();
+		Iterator iter = &mArr[it - mArr];
+
+		if (!n) 
+			return iter;
+
+		if (mArr + n > mInitSize) 
+		{
+			mInitSize = (mArrSize + n) << 2;
+			reallocate();
+		}
+
+		memmove(iter + n, iter, (mArrSize - (it - mArr)) * sizeof(Type));
+		Iterator tmpIter = iter;
+
+		for (auto& i : other) 
+		{
+			(*tmpIter) = i;
+			++tmpIter;
+		}
+
+		mArrSize += n;
+		
 		return iter;
 	}
 
@@ -613,6 +813,18 @@ namespace bs
 
 		memmove(iter, last, (mArrSize - (last - mArr)) * sizeof(Type));
 		mArrSize -= last - first;
+
+		return iter;
+	}
+
+	template <class Type>
+	typename BsVector<Type>::Iterator BsVector<Type>::erase(typename BsVector<Type>::ConstIterator it) 
+	{
+		Iterator iter = &mArr[it - mArr];
+
+		(*iter).~T();
+		memmove(iter, iter + 1, (mArrSize - (it - mArr) - 1) * sizeof(Type));
+		--mArrSize;
 
 		return iter;
 	}

@@ -1,263 +1,463 @@
 #pragma once
 
 #include "Prerequisites/BsPrerequisitesUtil.h"
-#include "Allocators/BsStaticAlloc.h"
 
 namespace bs
 {
-	template <class Type, class StaticAllocator = StaticAlloc<>>
-	class BsSmallVectorBuffer
+	template <UINT32 N, class Type>
+	class BsSmallVector final
 	{
 	public:
-		/** Types */
 		typedef Type ValueType;
 		typedef Type* Iterator;
 		typedef const Type* ConstIterator;
 		typedef std::reverse_iterator<Type*> ReverseIterator;
 		typedef std::reverse_iterator<const Type*> ConstReverseIterator;
 
-		BsSmallVectorBuffer(UINT32 N)
-			: mFirst(reinterpret_cast<Type*>(&firstElement)), mLast(reinterpret_cast<Type*>(&firstElement)),
-			mCapacity(reinterpret_cast<Type*>(&firstElement) + N) { }
+		typename std::aligned_storage<sizeof(Type), alignof(Type)>::type storage[N];
 
-		~BsSmallVectorBuffer()
+		BsSmallVector() {}
+
+		BsSmallVector(const BsSmallVector<N, ValueType>& other)
 		{
-			destroyElements(mFirst, mLast);
+			*this = other;
+		}
 
-			deallocateOldElements();
-		};
-
-		bool operator== (const BsSmallVectorBuffer& other)
+		BsSmallVector(UINT32 sz)
 		{
-			if (size() != other.size())
+			realloc(sz, false);
+		}
+
+		~BsSmallVector()
+		{
+			realloc(0, false);
+		}
+
+		BsSmallVector<N, ValueType>& operator= (const BsSmallVector<N, ValueType>& other)
+		{
+			if (mMaxSize < other.mMaxSize)
+			{
+				mMaxSize = other.mMaxSize << 2;
+				realloc(mMaxSize, false);
+			}
+
+			for (UINT32 i = 0; i < other.mSize; ++i)
+			{
+				mArr[i] = other.mArr[i];
+			}
+
+			mSize = other.mSize;
+		}
+
+		BsSmallVector<N, ValueType>& operator= (BsSmallVector<N, ValueType>&& other)
+		{
+			if (mMaxSize < other.mMaxSize)
+			{
+				mMaxSize = other.mMaxSize << 2;
+				realloc(mMaxSize, false);
+			}
+
+			for (UINT32 i = 0; i < other.mSize; ++i)
+			{
+				mArr[i] = std::move(other.mArr[i]);
+			}
+
+			mSize = other.mSize;
+		}
+
+		bool operator== (const BsSmallVector<N, ValueType>& other)
+		{
+			if (mSize != other.mSize)
 				return false;
 
-			const size_t s = size();
-			for (Type* tp = mFirst, *tph = other.mFirst, *e = mFirst + s; tp != e; ++tp, ++tph)
+			for (UINT32 i = 0; i < mSize; ++i)
 			{
-				if (*tp != tph)
+				if (mArr[i] != other.mArr[i])
 					return false;
 			}
 
 			return true;
 		}
 
-		bool operator!= (const BsSmallVectorBuffer& other) { return !(*this == other); }
+		bool operator!= (const BsSmallVector<N, ValueType>& other)
+		{
+			if (mSize != other.mSize)
+				return true;
 
-		Type& operator[] (size_t index) { return mFirst[index]; }
-		const Type& operator[] (size_t index) const { return mFirst[index]; }
+			for (UINT32 i = 0; i < mSize; ++i)
+			{
+				if (mArr[i] != other.mArr[i])
+					return true;
+			}
 
-		bool isEmpty() const { return mFirst == mLast; }
+			return false;
+		}
 
-		/** Forward iteration methods. */
-		Iterator begin() { return mFirst; }
-		Iterator end() { return mLast; }
+		bool operator< (const BsSmallVector<N, ValueType>& other) const
+		{
+			UINT32 lenght = mSize < other.mSize ? mSize : other.mSize;
 
-		/** Constant Forward iteration methods. */
-		ConstIterator cbegin() const { return mFirst; }
-		ConstIterator cend() const { return mLast; }
+			for (UINT32 i = 0; i < lenght; ++i)
+			{
+				if (mArr[i] != other.mArr[i])
+					return mArr[i] < other.mArr[i];
+			}
 
-		/** Reverse iteration methods. */
-		ReverseIterator rbegin() { return ReverseIterator(end()); }
-		ReverseIterator rend() { return ReverseIterator(begin()); }
+			return mSize < other.mSize;
+		}
 
-		/** Constant Reverse iteration methods. */
-		ConstReverseIterator crbegin() const { return ReverseIterator(end()); }
-		ConstReverseIterator crend() const { return ReverseIterator(begin()); }
+		bool operator<= (const BsSmallVector<N, ValueType>& other) const
+		{
+			UINT32 length = mSize < other.mSize ? mSize : other.mSize;
 
-		/** Return the size of the small vector. */
-		size_t size() { return mLast - mFirst; }
+			for (UINT32 i = 0; i < length; ++i)
+			{
+				if (mArr[i] != other.mArr[i])
+					return mArr[i] < other.mArr[i];
+			}
 
-		/** Return the front element of the small vector. */
-		Type& front() { return mFirst[0]; }
+			return mSize <= other.mSize;
+		}
 
-		/** Return the back element of the small vector. */
-		Type& back() { return mLast[-1]; }
+		bool operator> (const BsSmallVector<N, ValueType>& other) const
+		{
+			UINT32 length = mSize < other.mSize ? mSize : other.mSize;
 
-		/** Return the constant front element of the small vector. */
-		const Type& front() const { return mFirst[0]; }
+			for (UINT32 i = 0; i < length; ++i)
+			{
+				if (mArr[i] != other.mArr[i])
+					return mArr[i] > other.mArr[i];
+			}
 
-		/** Return the constant back element of the small vector. */
-		const Type& back() const { return mLast[-1]; }
+			return mSize > other.mSize;
+		}
 
-		/** Push the element into the small vector. */
+		bool operator>= (const BsSmallVector<N, ValueType>& other) const
+		{
+			UINT32 length = mSize < other.mSize ? mSize : other.mSize;
+
+			for (UINT32 i = 0; i < length; ++i)
+			{
+				if (mArr[i] != other.mArr[i])
+					return mArr[i] > other.mArr[i];
+			}
+
+			return mSize >= other.mSize;
+		}
+
+		Type& operator[] (UINT32 index) { return reinterpret_cast<Type*>(storage)[index]; };
+		const Type& operator[] (UINT32 index) const { return reinterpret_cast<Type*>(storage)[index]; };
+
+		bool isEmpty() const { return mSize == 0; };
+
+		Iterator begin() { return reinterpret_cast<Type*>(storage); };
+		Iterator end() { return reinterpret_cast<Type*>(storage) + mSize; };
+
+		ConstIterator cbegin() const { return reinterpret_cast<Type*>(storage); };
+		ConstIterator cend() const { return reinterpret_cast<Type*>(storage) + mSize; };
+
+		ReverseIterator rbegin() { ReverseIterator(begin()); };
+		ReverseIterator rend() { ReverseIterator(end()); };
+
+		ConstReverseIterator crbegin() const { ReverseIterator(begin()); };
+		ConstReverseIterator crend() const { ReverseIterator(end()); };
+
+		UINT32 size() { return mSize; };
+		UINT32 capacity() { return mMaxSize; }
+
+		Type* data() { return mArr; }
+		const Type* data() const { return mArr; }
+
+		Type* front() { return reinterpret_cast<Type*>(storage)[0]; };
+		Type* back() { return reinterpret_cast<Type*>(storage)[mSize - 1]; };
+
+		const Type* front() const { reinterpret_cast<Type*>(storage)[0]; };
+		const Type* back() const { reinterpret_cast<Type*>(storage)[mSize - 1]; };
+
 		void add(const Type& element)
 		{
-			if (mLast < mCapacity)
+			if (mSize == mMaxSize)
 			{
-				new (mLast) ValueType(element);
-				++mLast;
+				if (mMaxSize == 0)
+				{
+					realloc(1, false);
+				}
+				else
+				{
+					realloc(2 * mMaxSize, true);
+				}
+
+				if (mSize == mMaxSize)
+				{
+					return;
+				}
 			}
+
+			mArr[mSize++] = element;
 		}
 
-		/** Pop the element into the small vector. */
+		void add(Type&& element)
+		{
+			if (mSize == mMaxSize)
+			{
+				if (mMaxSize == 0)
+				{
+					realloc(1, false);
+				}
+				else
+				{
+					realloc(2 * mMaxSize, true);
+				}
+
+				if (mSize == mMaxSize)
+				{
+					return;
+				}
+			}
+
+			mArr[mSize++] = std::move(element);
+		}
+
 		void pop()
 		{
-			--mLast;
-			mLast->~ValueType();
+			return mArr[--mSize];
 		}
 
-		/** Clear the elements of the small vector. */
+		void remove(int index)
+		{
+			if (index < mSize)
+			{
+				for (UINT32 i = index; i < mSize - 1; i++)
+				{
+					mArr[i] = mArr[i + 1];
+				}
+
+				pop();
+			}
+		}
+
+		bool contains(const Type& element)
+		{
+			for (UINT32 i = 0; i < mSize; i++)
+			{
+				if (mArr[i] == element)
+					return true;
+			}
+
+			return false;
+		}
+
+		void removeValue(const Type& element)
+		{
+			for (UINT32 i = 0; i < mSize; i++)
+			{
+				if (mArr[i] == element)
+				{
+					remove(i);
+					break;
+				}
+			}
+		}
+
 		void clear()
 		{
-			destroyElements(mFirst, mLast);
-			mLast = mFirst;
+			for (UINT32 i = 0; i < mSize; ++i)
+			{
+				mArr[i].~Type();
+			}
+
+			mSize = 0;
 		}
 
-		/** Resize N size allocations into the small vector. */
-		void resize(UINT32 N)
+		void reserve(UINT32 sz, bool c)
 		{
-			if (N < size())
+			if (sz > mMaxSize)
 			{
-				destroyElements(mFirst + N, mLast);
-				mLast = mFirst + N;
-			}
-			else if (N > size())
-			{
-				if (static_cast<UINT32>(mCapacity - mLast) < N)
+				if (sz > mMaxSize)
 				{
-					grow(N);
+					return;
 				}
 
-				constructElements(mLast, mFirst + N, ValueType());
-				mLast = mFirst + N;
-			}
-		}
-
-		/** Reserve N size allocations into the small vector. */
-		void reserve(UINT32 N)
-		{
-			if (static_cast<UINT32>(mCapacity - mLast) < N)
-			{
-				grow(N);
-			}
-		}
-
-		protected:
-			/** Determines when the small vector has not had dynamic allocation. */
-			bool isSmall() const
-			{
-				return static_cast<const void*>(mFirst) == static_cast<const void*>(&firstElement);
-			}
-
-			void deallocateOldElements()
-			{
-				if (!isSmall())
+				if (c)
 				{
-					//operator delete(mFirst);
-					mStaticAlloc.destruct<Type>(mFirst); // Add New
+					realloc(sz, true);
+				}
+				else
+				{
+					reallocNoConstruct(sz, true);
 				}
 			}
 
-			/** Construct the elements range. */
-			void constructElements(Type* f, Type* l, const Type& element)
-			{
-				for (; f != l; ++f)
-				{
-					new (f) ValueType(element);
-				}
-			}
-
-			/** Destroy the elements range. */
-			void destroyElements(Type* f, Type* l)
-			{
-				while (f != l)
-				{
-					--l;
-					l->~ValueType();
-				}
-			}
-
-		void grow(size_t min = 0)
-		{
-			const size_t current = mCapacity - mFirst;
-			const size_t size = size();
-			size_t newCapacity = current * 2;
-
-			if (newCapacity < min)
-			{
-				newCapacity = min;
-			}
-
-			//Type* newElements = static_cast<Type*>(operator new(newCapacity * sizeof(ValueType)));
-			Type* newElements = static_cast<Type*>(mStaticAlloc.construct<Type>(newCapacity * sizeof(ValueType))); // Add Newf
-
-			if (std::is_class<ValueType>::value)
-			{
-				std::uninitialized_copy(mFirst, mLast, newElements);
-			}
-			else
-			{
-				memcpy(newElements, mFirst, size * sizeof(ValueType));
-			}
-
-			destroyElements(mFirst, mLast);
-
-			deallocateOldElements();
-
-			mFirst = newElements;
-			mLast = newElements + size;
-			mCapacity = mFirst + newCapacity;
+			mSize = sz;
 		}
 
-	protected:
-		ValueType* mFirst;
-		ValueType* mLast;
-		ValueType* mCapacity;
-		StaticAlloc<> mStaticAlloc;
-
-		/**
-		* Choose which system to use for the space representation.
-		*/
-#ifdef BS_SMALL_VECTOR_USE_CHAR
-		typedef char U;
-		U firstElement __declspec(align(16));
-#else
-		union U
-		{
-			long long L;
-			long double LD;
-			double D;
-			void* ptr;
-		} firstElement;
-#endif
-	};
-
-	template <UINT32 N, class Type>
-	class BsSmallVector final : public BsSmallVectorBuffer<Type>
-	{
-	public:
-		typedef Type ValueType;
 	private:
-		typedef typename BsSmallVectorBuffer<Type>::U Unit;
-
-		/** The number of the union U require for N template type. */
-		static constexpr auto MINUNIT = (static_cast<UINT32>(sizeof(ValueType))*N +
-			static_cast<UINT32>(sizeof(Unit)) - 1 /
-			static_cast<UINT32>(sizeof(Unit)));
-
-		/** Contains the number of elements of the array. */
-		static constexpr auto ELEMENTS = (MINUNIT - 1) > 0 ? (MINUNIT - 1) : 1;
-
-		/** Contains the number of template type that the arrays has space for. */
-		static constexpr auto ALLOC = (ELEMENTS + 1)*static_cast<UINT32>(sizeof(Unit)) /
-			static_cast<UINT32>(sizeof(ValueType));
-
-		/** Instance of the union U in the small vector buffer. */
-		Unit element[ELEMENTS];
-
-	public:
-		BsSmallVector() : BsSmallVectorBuffer<ValueType>(ALLOC) { };
-		BsSmallVector(size_t size, const Type& value = ValueType())
-			: BsSmallVectorBuffer<ValueType>(ALLOC)
+		void realloc(UINT32 elements, bool data)
 		{
-			this->reserve(size);
-			while (size--)
+			Type* tmp = 0;
+
+			if (elements)
 			{
-				add(value);
+				if (sizeof(Type) * elements <= sizeof(storage))
+				{
+					// It uses the internal storage.
+					tmp = reinterpret_cast<Type*>(storage);
+				}
+				else
+				{
+					// Allocate the elements.
+					tmp = bs_allocN<Type>(elements);
+
+					if (tmp == 0)
+					{
+						// Out of memory.
+						return;
+					}
+				}
+
+				if (mArr == tmp)
+				{
+					// Construct only the newly allocated elements.
+					for (UINT32 i = mSize; i < elements; i++)
+					{
+						new (&tmp[i]) Type();
+					}
+				}
+				else
+				{
+					// Construct all elements.
+					for (UINT32 i = 0; i < elements; i++)
+					{
+						new (&tmp[i]) Type();
+					}
+				}
 			}
+
+			if (mArr)
+			{
+				const unsigned oldSize = mSize;
+				if (mArr == tmp)
+				{
+					if (data)
+					{
+						if (mSize > elements)
+						{
+							mSize = elements;
+						}
+					}
+					else
+					{
+						mSize = 0;
+					}
+
+					// Destruct the elements that are no longer used in the array.
+					for (UINT32 i = mSize; i < oldSize; i++)
+					{
+						mArr[i].~Type();
+					}
+				}
+				else
+				{
+					if (data)
+					{
+						if (mSize > elements)
+						{
+							mSize = elements;
+						}
+
+						for (UINT32 i = 0; i < mSize; i++)
+						{
+							tmp[i] = mArr[i];
+						}
+					}
+					else
+					{
+						mSize = 0;
+					}
+
+					// Destruct all the elements.
+					for (UINT32 i = 0; i < oldSize; i++)
+					{
+						mArr[i].~Type();
+					}
+
+					if (mArr != reinterpret_cast<Type*>(storage))
+					{
+						bs_free(mArr);
+					}
+				}
+			}
+
+			mArr = tmp;
+			mMaxSize = elements;
 		}
 
-		~BsSmallVector() = default;
+		void reallocNoConstruct(UINT32 elements, bool data)
+		{
+			Type* tmp = 0;
+
+			if (elements)
+			{
+				if (sizeof(Type) * elements <= sizeof(storage))
+				{
+					tmp = reinterpret_cast<Type*>(storage);
+				}
+				else
+				{
+					tmp = bs_allocN<Type>(elements);
+
+					if (tmp == 0)
+					{
+						return;
+					}
+				}
+			}
+
+			if (mArr)
+			{
+				if (mArr == tmp)
+				{
+					if (data)
+					{
+						if (mSize > elements)
+						{
+							mSize = elements;
+						}
+					}
+					else
+					{
+						mSize = 0;
+					}
+				}
+				else
+				{
+					if (data)
+					{
+						if (mSize > elements)
+						{
+							mSize = elements;
+						}
+
+						memcpy(tmp, mArr, sizeof(Type) * mArr);
+					}
+					else
+					{
+						mSize = 0;
+					}
+
+					if (mArr != reinterpret_cast<Type*>(storage))
+					{
+						bs_free(mArr);
+					}
+				}
+			}
+
+			mArr = tmp;
+			mMaxSize = elements;
+		}
+
+		Type* mArr = nullptr;
+		UINT32 mSize = 0;
+		UINT32 mMaxSize = 0;
 	};
 }
