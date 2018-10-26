@@ -145,16 +145,16 @@ namespace bs
 			return mSize >= other.mSize;
 		}
 
-		Type& operator[] (UINT32 index) { return reinterpret_cast<Type*>(storage)[index]; };
-		const Type& operator[] (UINT32 index) const { return reinterpret_cast<Type*>(storage)[index]; };
+		Type& operator[] (UINT32 index) { return mArr[index]; };
+		const Type& operator[] (UINT32 index) const { return mArr[index]; };
 
 		bool isEmpty() const { return mSize == 0; };
 
-		Iterator begin() { return reinterpret_cast<Type*>(storage); };
-		Iterator end() { return reinterpret_cast<Type*>(storage) + mSize; };
+		Iterator begin() { return mArr; };
+		Iterator end() { return mArr + mSize; };
 
-		ConstIterator cbegin() const { return reinterpret_cast<Type*>(storage); };
-		ConstIterator cend() const { return reinterpret_cast<Type*>(storage) + mSize; };
+		ConstIterator cbegin() const { return mArr; };
+		ConstIterator cend() const { return mArr + mSize; };
 
 		ReverseIterator rbegin() { ReverseIterator(begin()); };
 		ReverseIterator rend() { ReverseIterator(end()); };
@@ -168,11 +168,11 @@ namespace bs
 		Type* data() { return mArr; }
 		const Type* data() const { return mArr; }
 
-		Type* front() { return reinterpret_cast<Type*>(storage)[0]; };
-		Type* back() { return reinterpret_cast<Type*>(storage)[mSize - 1]; };
+		Type* front() { return mArr[0]; };
+		Type* back() { return mArr[mSize - 1]; };
 
-		const Type* front() const { reinterpret_cast<Type*>(storage)[0]; };
-		const Type* back() const { reinterpret_cast<Type*>(storage)[mSize - 1]; };
+		const Type* front() const { return mArr[0]; };
+		const Type* back() const { return mArr[mSize - 1]; };
 
 		void add(const Type& element)
 		{
@@ -269,23 +269,11 @@ namespace bs
 			mSize = 0;
 		}
 
-		void reserve(UINT32 sz, bool c)
+		void reserve(UINT32 sz)
 		{
 			if (sz > mMaxSize)
-			{
-				if (sz > mMaxSize)
-				{
-					return;
-				}
-
-				if (c)
-				{
-					realloc(sz, true);
-				}
-				else
-				{
-					reallocNoConstruct(sz, true);
-				}
+			{	
+				realloc(sz, true);
 			}
 
 			mSize = sz;
@@ -379,70 +367,6 @@ namespace bs
 					for (UINT32 i = 0; i < oldSize; i++)
 					{
 						mArr[i].~Type();
-					}
-
-					if (mArr != reinterpret_cast<Type*>(storage))
-					{
-						bs_free(mArr);
-					}
-				}
-			}
-
-			mArr = tmp;
-			mMaxSize = elements;
-		}
-
-		void reallocNoConstruct(UINT32 elements, bool data)
-		{
-			Type* tmp = 0;
-
-			if (elements)
-			{
-				if (sizeof(Type) * elements <= sizeof(storage))
-				{
-					tmp = reinterpret_cast<Type*>(storage);
-				}
-				else
-				{
-					tmp = bs_allocN<Type>(elements);
-
-					if (tmp == 0)
-					{
-						return;
-					}
-				}
-			}
-
-			if (mArr)
-			{
-				if (mArr == tmp)
-				{
-					if (data)
-					{
-						if (mSize > elements)
-						{
-							mSize = elements;
-						}
-					}
-					else
-					{
-						mSize = 0;
-					}
-				}
-				else
-				{
-					if (data)
-					{
-						if (mSize > elements)
-						{
-							mSize = elements;
-						}
-
-						memcpy(tmp, mArr, sizeof(Type) * mArr);
-					}
-					else
-					{
-						mSize = 0;
 					}
 
 					if (mArr != reinterpret_cast<Type*>(storage))
